@@ -2,32 +2,44 @@ import requests
 import json
 from bs4 import BeautifulSoup
 def createURL(zipcode, loType):
-    url = "https://www.google.com/maps/search/restaurants+in+<location>"
-    url = url.replace("restaurants", loType) #put type requested
-    url = url.replace("location", str(zipcode)) #put zipcode in there
+
+    #url = f"https://www.google.com/maps/search/{loType}+{zipcode}"
+    #business_type = loType #put type requested
+    #zipcode = str(zipcode)  #put zipcode in there
     print(loType)
     print (url)
     return url
 
 def doRequest(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+    }
     response = requests.get(url)
-    html_content= response.text
-    data = response.text
-    with open('fileJ.json', 'w') as file:
-        file.write(data)
-    return html_content
+    
+    parseResult(response)
 
-def parseResult(html_content): #parse result
-    soup = BeautifulSoup(html_content, 'html.parser')
-    restaurants = soup.find_all("div", class_="section-result-details-container")
-    print(restaurants)
-    for restaurant in restaurants:
-        name = restaurant.find("h3", class_="section-result-title").text.strip()
-        address = restaurant.find("span", class_="section-result-location").text.strip()
+def parseResult(response): #parse result
+    data = BeautifulSoup(response.text, 'html.parser')
+    data1 = data.find_all("ul")
+    print(data1)
+    for i in data1:
+        for li in i.find_all("li"):
+            for h3 in li.find_all("h3"):
+                print(h3.text, end=" ")
+    
+    
+    
+    #businesses = []
+    #for item in soup.find_all("h4", class_="css-1qn0b6x"):
+     #   name = item.text.strip()
+      #  businesses.append(name)
+    #else:
+    #    print("Failed to fetch data")
+    #print(businesses)
+    #for restaurant in businesses:
+     #   print("Name:", name)
+      #  print("-"*50)
 
-        print("Name:", name)
-        print("Address:", address)
-        print("-"*50)
-
-url = createURL(19121, "restaurants")
-parseResult(doRequest(url))
+url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
+#createURL(19121, "restaurants")
+doRequest(url)
