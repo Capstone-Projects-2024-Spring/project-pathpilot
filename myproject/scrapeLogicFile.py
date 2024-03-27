@@ -34,7 +34,11 @@ def parseResult(response): #parse result
                     priceIcon = str(priceRange.text)
                     businessArray.append(priceIcon)
                 else:
-                    businessArray.append("N/A")
+                    businessArray.append("N/A") #unable to add this because the class is just neevr found
+            for buzzWordsClass in li.find_all(class_="css-11bijt4"): #everyone should get three please
+                if(buzzWordsClass.text != None):
+                    buzzWord = str(buzzWordsClass.text)
+                    businessArray.append(buzzWord)
             if businessArray!=[]:
                 print(businessArray)
     
@@ -55,9 +59,9 @@ def parseResult(response): #parse result
 url = createURL(19122, "restaurants")
 num=0
 doRequest(url)
-#while(num<=30): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
-  #  val = num*10
-   # tempUrl= url + f"&start={val}"
-   # doRequest(tempUrl)
-   # num+=1
+while(num<=30): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    val = num*10
+    tempUrl= url + f"&start={val}"
+    doRequest(tempUrl)
+    num+=1
 #&start=10
