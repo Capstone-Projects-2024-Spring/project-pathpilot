@@ -39,7 +39,7 @@ def parseResult(response): #parse result
                 if(buzzWordsClass.text != None):
                     buzzWord = str(buzzWordsClass.text)
                     businessArray.append(buzzWord)
-            if businessArray!=[]:
+            if businessArray!=[] and businessArray!=['Nearby cities', 'Neighborhoods']:
                 print(businessArray)
     
     
@@ -57,11 +57,13 @@ def parseResult(response): #parse result
 
 #url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
 url = createURL(19122, "restaurants")
-num=0
+numb=0
 doRequest(url)
-while(num<=30): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
-    val = num*10
+numb+=1
+while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    val = numb*10
     tempUrl= url + f"&start={val}"
     doRequest(tempUrl)
-    num+=1
+    numb+=1
+
 #&start=10
