@@ -21,14 +21,22 @@ def doRequest(url):
 def parseResult(response): #parse result
     data = BeautifulSoup(response.text, 'html.parser')
     data1 = data.find_all("ul")
-    
+    num=0
     for i in data1:
-        businessArray=[]
         for li in i.find_all("li"):
+            num+=1
+            businessArray=[]
             for h3 in li.find_all("h3"):
-                print(h3.text, end=" ")
+                if(h3.text!=None):
+                    businessArray.append(h3.text)
+                #print(h3.text, end=" ")
             for classThing in li.find_all(class_="css-14g69b3"):
-                print(classThing.get('aria-label'))
+                if(classThing.get('aria-label') != None):
+                    businessArray.append(str(classThing.get('aria-label')))
+                    #print(classThing.get('name'))
+                #print(classThing.get('aria-label'))
+            if businessArray!=[]:
+                print(businessArray)
     
     
     
