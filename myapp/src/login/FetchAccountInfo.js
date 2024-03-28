@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-export const FetchAccountInfo = async (username, email, password) => {
+export const FetchAccountInfo = async (username, password) => {
    /* try {
         const response = await axios.post('https://example.com/api/account', {
             username,

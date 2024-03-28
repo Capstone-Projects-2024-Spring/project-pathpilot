@@ -78,11 +78,15 @@ pip install django-cors-headers
 
 npm install axios
 
+npm install react-router-dom 
+
 *Django Rest Framework - this is used to build API endpoints*
 
 *Django-cors-headers - this is middleware for handling CORS (cross-origin resource sharing headers) to prevent cross-origin requests. security thing*
 
 *Axios - this is a Javascript library used for making HTTP requests from browser or Node.js*
+
+*react-router-dom - this is a package that allows routing in react applications* 
 
 ### 4. Run the Project
 
@@ -97,3 +101,5 @@ python manage.py runserver
 npm start
 
 This will start the React development server. Open your web browser and navigate to http://localhost:3000/
+
+For login screen navigate to http://localhost:3000/login
