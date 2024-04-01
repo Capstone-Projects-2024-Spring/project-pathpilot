@@ -25,9 +25,9 @@ def parseResult(response): #parse result
                 if(h3.text!=None):
                     businessArray.append(h3.text)
                 #print(h3.text, end=" ")
-            for ratingClass in li.find_all(class_="css-gutk1c"):
-                if(ratingClass.text != None):
-                    rating = ratingClass.text
+            for ratingClass in li.find_all(class_="css-14g69b3"):
+                if(ratingClass.get('aria-label') != None):
+                    rating = str(ratingClass.get('aria-label'))
                     businessArray.append(rating)
             for priceRange in li.find_all(class_="priceRange__09f24__ZgJXy css-blvn7s"):
                 if(priceRange.text != None):
@@ -67,3 +67,5 @@ while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, progr
     numb+=1
 
 #&start=10
+
+
