@@ -25,21 +25,25 @@ def parseResult(response): #parse result
                 if(h3.text!=None):
                     businessArray.append(h3.text)
                 #print(h3.text, end=" ")
+            if(businessArray == []):
+                continue
             for ratingClass in li.find_all(class_="css-gutk1c"):
                 if(ratingClass.text != None):
                     rating = ratingClass.text
                     businessArray.append(rating)
+            if(len(businessArray)!= 2):
+                businessArray.append("No Rating Found")
             for priceRange in li.find_all(class_="priceRange__09f24__ZgJXy css-blvn7s"):
                 if(priceRange.text != None):
                     priceIcon = str(priceRange.text)
                     businessArray.append(priceIcon)
-                else:
-                    businessArray.append("N/A") #unable to add this because the class is just neevr found
-            for buzzWordsClass in li.find_all(class_="css-11bijt4"): #everyone should get three please
-                if(buzzWordsClass.text != None):
-                    buzzWord = str(buzzWordsClass.text)
-                    businessArray.append(buzzWord)
-            if businessArray!=[] and businessArray!=['Nearby cities', 'Neighborhoods']:
+            if(len(businessArray)!= 3):
+                businessArray.append("No Price Found")
+            #for buzzWordsClass in li.find_all(class_="css-11bijt4"): #everyone should get three please
+            #    if(buzzWordsClass.text != None):
+             #       buzzWord = str(buzzWordsClass.text)
+             #       businessArray.append(buzzWord)
+            if businessArray!=[] and businessArray!=['Nearby cities', 'Neighborhoods', 'No Price Found']:
                 print(businessArray)
     
     
