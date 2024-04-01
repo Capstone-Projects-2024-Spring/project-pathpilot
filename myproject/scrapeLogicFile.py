@@ -49,6 +49,10 @@ def parseResult(response): #parse result
              #       businessArray.append(buzzWord)
             if businessArray!=[] and businessArray[0]!= "cities":
                 print(businessArray)
+            insideResponse = genInsideURL(businessArray[0])
+            insideResults = parseInsideRequest(insideResponse)
+            #for item in insideResults:
+             #   businessArray.append(item) #add them all to the arrays
     
     
     
@@ -65,18 +69,20 @@ def parseResult(response): #parse result
 
 
 
-def insideRequest(busArray):
+def parseInsideRequest(response): #returns array of inside info
+    data = BeautifulSoup(response.text, 'html.parser')
+    #PUT PARSING CODE HERE TO GATHER DATA
     return 
 
 
 
 def genInsideURL(placename):
-    print(placename)
     placename = placename.replace(" ", "-")
-    print(placename)
     placename = placename.replace("'","")
-    print(placename)
     url = f"https://www.yelp.com/biz/{placename}-philadelphia"
+    response = requests.get(url)
+    return response
+    
 
 
 
