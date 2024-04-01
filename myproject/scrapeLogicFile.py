@@ -1,3 +1,4 @@
+import unicodedata
 import requests
 import json
 from bs4 import BeautifulSoup
@@ -23,8 +24,10 @@ def parseResult(response): #parse result
             businessArray=[]
             for h3 in li.find_all("h3"):
                 if(h3.text!=None):
-                    businessArray.append(h3.text)
-                #print(h3.text, end=" ")
+                    name = h3.text
+                    name = unicodedata.normalize('NFKD', name) #gets rid of html converter issues
+                    #name = name.split(' ')[-1] uncomment this line if you want to get rid of the numbers on the restaurant title, will affect nearby cities thing
+                    businessArray.append(name)
             if(businessArray == []):
                 continue
             for ratingClass in li.find_all(class_="css-gutk1c"):
