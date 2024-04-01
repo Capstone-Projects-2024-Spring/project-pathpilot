@@ -26,13 +26,14 @@ def parseResult(response): #parse result
                 if(h3.text!=None):
                     name = h3.text
                     name = unicodedata.normalize('NFKD', name) #gets rid of html converter issues
-                    #name = name.split(' ')[-1] uncomment this line if you want to get rid of the numbers on the restaurant title, will affect nearby cities thing
+                    nameList = name.split(' ')[1:] #uncomment this line if you want to get rid of the numbers on the restaurant title, will affect nearby cities thing
+                    name = " ".join(nameList) #put array back together
                     businessArray.append(name)
             if(businessArray == []):
                 continue
             for ratingClass in li.find_all(class_="css-gutk1c"):
                 if(ratingClass.text != None):
-                    rating = ratingClass.text
+                    rating = ratingClass.text.strip() #get rid of whitespace
                     businessArray.append(rating)
             if(len(businessArray)!= 2):
                 businessArray.append("No Rating Found")
@@ -46,7 +47,7 @@ def parseResult(response): #parse result
             #    if(buzzWordsClass.text != None):
              #       buzzWord = str(buzzWordsClass.text)
              #       businessArray.append(buzzWord)
-            if businessArray!=[] and businessArray!=['Nearby cities', 'Neighborhoods', 'No Price Found']:
+            if businessArray!=[] and businessArray[0]!= "cities":
                 print(businessArray)
     
     
@@ -62,15 +63,41 @@ def parseResult(response): #parse result
      #   print("Name:", name)
       #  print("-"*50)
 
+
+
+def insideRequest(busArray):
+    return 
+
+
+
+def genInsideURL(placename):
+    print(placename)
+    placename = placename.replace(" ", "-")
+    print(placename)
+    placename = placename.replace("'","")
+    print(placename)
+    url = f"https://www.yelp.com/biz/{placename}-philadelphia"
+
+
+
 #url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
 url = createURL(19122, "restaurants")
 numb=0
 doRequest(url)
 numb+=1
-while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
-    val = numb*10
-    tempUrl= url + f"&start={val}"
-    doRequest(tempUrl)
-    numb+=1
-
+#while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+ #   val = numb*10
+#    tempUrl= url + f"&start={val}"
+#    doRequest(tempUrl)
+#    numb+=1
+#genInsideURL("Maggie's place")
 #&start=10
+    
+
+
+#https://www.yelp.com/biz/barbuzzo-philadelphia?osq=restaurants
+#https://www.yelp.com/biz/the-fabric-workshop-and-museum-philadelphia
+#https://www.yelp.com/biz/talulas-garden-philadelphia?osq=restaurants
+#https://www.yelp.com/biz/suraya-philadelphia-2?osq=restaurants
+
+#url = https://www.yelp.com/biz/PLACENAMEWITHDASHESANDNNOAPOSTROPHES-philadelphia
