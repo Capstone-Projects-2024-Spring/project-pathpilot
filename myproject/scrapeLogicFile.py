@@ -96,11 +96,46 @@ def parseInsideRequest(response): #returns array of inside info
                             hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
                # print(daysArray)
                 print(hoursArray)
-        #for attributes in i.find_all()
+        for attributesTable in i.find_all(class_= "css-ufd2i"):
+            attributeArray = []
+            for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg css-1qn0b6x"):
+                for trait in attributesSection.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
+                    if(trait.text!=None):
+                        attribute = trait.text
+                        match attribute:
+                            case "Not Good For Kids":
+                                attributeArray.append(attribute)
+                            case "Good For Kids":
+                                attributeArray.append(attribute)
+                            case "Happy Hour Specials":
+                                attributeArray.append(attribute)
+                            case "Good for Groups":
+                                attributeArray.append(attribute)
+                            case "Outdoor Seating":
+                                attributeArray.append(attribute)
+                            case "No Outdoor Seating":
+                                attributeArray.append(attribute)
+                            case "Classy":
+                                attributeArray.append(attribute)
+                            case "Casual":
+                                attributeArray.append(attribute)
+                            case attribute if "Romantic" in attribute:
+                                attributeArray.append("Romantic")
+                            case attribute if "Intimate" in attribute and "Romantic" not in attributeArray:
+                                attributeArray.append("Romantic")
+                            case attribute if "Hipster" in attribute:
+                                attributeArray.append("Trendy")
+                            case attribute if "Trendy" in attribute and "Trendy" not in attributeArray:
+                                attributeArray.append("Trendy")
+            if(attributeArray!=[]):
+                print(attributeArray)
+                            
+
+                        
+
     return extraInfo
             
-    #PUT PARSING CODE HERE TO GATHER DATA
-    return 
+    #PUT PARSING CODE HERE TO GATHER DATA 
 
 
 
