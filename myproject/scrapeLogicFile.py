@@ -9,6 +9,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
+
+insideURLArray = []
 def createURL(zipcode, loType):
     url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
@@ -24,48 +26,30 @@ def doRequest(url):
 def parseResult(response): #parse result
     data = BeautifulSoup(response.text, 'html.parser')
     data1 = data.find_all("ul")
-    num=0
     for i in data1:
         for li in i.find_all("li"):
             insideURL = ""
-            num+=1
             businessArray=[]
             for h3 in li.find_all("h3"):
                 if(h3.text!=None):
-                    name = h3.text
                     if(h3.find('a')!=None):
-                        insideURL= h3.find('a').get('href') #get this business's own URL
-                    name = unicodedata.normalize('NFKD', name) #gets rid of html converter issues
-                    nameList = name.split(' ')[1:] #uncomment this line if you want to get rid of the numbers on the restaurant title, will affect nearby cities thing
-                    name = " ".join(nameList) #put array back together
-                    businessArray.append(name)
-            if(businessArray == []):
-                continue
-            for ratingClass in li.find_all(class_="css-gutk1c"):
-                if(ratingClass.text != None):
-                    rating = ratingClass.text.strip() #get rid of whitespace
-                    businessArray.append(rating)
-            if(len(businessArray)!= 2):
-                businessArray.append("No Rating Found")
-            for priceRange in li.find_all(class_="priceRange__09f24__ZgJXy css-blvn7s"):
-                if(priceRange.text != None):
-                    priceIcon = str(priceRange.text)
-                    businessArray.append(priceIcon)
-            if(len(businessArray)!= 3):
-                businessArray.append("No Price Found")
+                        insideURL= h3.find('a').get('href') 
+                        global insideURLArray
+                        insideURLArray.append(insideURL) #SOMETHING IS WRONG< EMPTY URLS, 
+                        #get this business's own URL
             #for buzzWordsClass in li.find_all(class_="css-11bijt4"): #everyone should get three please
             #    if(buzzWordsClass.text != None):
              #       buzzWord = str(buzzWordsClass.text)
              #       businessArray.append(buzzWord)
-            
-            insideResponse = genInsideURL(insideURL)
-            insideResults = parseInsideRequest(insideResponse)
-            for i in insideResults:
-                businessArray.append(i)
-            if businessArray!=[] and businessArray[0]!= "cities":
-                print(businessArray)
-                print()
-
+            if(insideURL!=""):
+                insideResponse = genInsideURL(insideURL)
+                insideResults = parseInsideRequest(insideResponse)
+                for i in insideResults:
+                    businessArray.append(i)
+                if businessArray!=[] and businessArray[0]!= "cities":
+                    print(businessArray)
+                    print()
+    print(insideURLArray)
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
     
@@ -78,6 +62,22 @@ def parseInsideRequest(response): #returns array of inside info
     data = BeautifulSoup(response, 'html.parser')
     data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
     extraInfo = []
+    for header in data.find_all(class_="photo-header-content-container__09f24__jDLBB css-1qn0b6x"):
+        for name in header.find_all(class_="css-hnttcw"):
+            if(name.text!=None):
+                name = name.text
+                name = unicodedata.normalize('NFKD', name) #gets rid of html converter issues
+                extraInfo.append(name)
+        for ratingSect in header.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-v3nuob"):
+            for rating in ratingSect.find_all(class_="css-1fdy0l5"):
+                if(rating.text!=None and rating.text!="Unclaimed "): #idk who had the unclaimed issue so both are here to be safe
+                    extraInfo.append(rating.text)
+        for price in header.find_all(class_="css-14r9eb"):
+            if(price.text!=None and price.text!="Unclaimed "):
+                extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
+
+
+
     for i in data1:
         for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
             for strAddress in locationOuter.find_all(class_ = "raw__09f24__T4Ezm"):
