@@ -2,6 +2,12 @@ import re
 import unicodedata
 import requests
 import json
+from selenium import webdriver
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
 def createURL(zipcode, loType):
     url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
@@ -65,21 +71,11 @@ def parseResult(response): #parse result
     
     
     
-    #businesses = []
-    #for item in soup.find_all("h4", class_="css-1qn0b6x"):
-     #   name = item.text.strip()
-      #  businesses.append(name)
-    #else:
-    #    print("Failed to fetch data")
-    #print(businesses)
-    #for restaurant in businesses:
-     #   print("Name:", name)
-      #  print("-"*50)
 
 
 
 def parseInsideRequest(response): #returns array of inside info
-    data = BeautifulSoup(response.text, 'html.parser')
+    data = BeautifulSoup(response, 'html.parser')
     data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
     extraInfo = []
     for i in data1:
@@ -95,11 +91,12 @@ def parseInsideRequest(response): #returns array of inside info
                     #for day in row.find_all(class_="day-of-the-week__09f24__JJea_ css-ux5mu6"):
                     #    if(day!=None):
                     #        daysArray.append(day.text)
-                    for hours in row.find_all(class_="no-wrap__09f24__c3plq css-1p9ibgf"):
+                    for hours in row.find_all(class_="no-wrap__09f24__c3plq css-1p9ibgf"): #working under presumption of Mon-Sun
                         if(hours!=None):
-                            hoursArray.append(hours.text)
+                            hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
                # print(daysArray)
                 print(hoursArray)
+        #for attributes in i.find_all()
     return extraInfo
             
     #PUT PARSING CODE HERE TO GATHER DATA
@@ -109,7 +106,22 @@ def parseInsideRequest(response): #returns array of inside info
 
 def genInsideURL(insideURL):
     url = f"https://www.yelp.com/{insideURL}"
-    response = requests.get(url)
+    driver = webdriver.Chrome()
+    driver.get(url)
+    driver.implicitly_wait(5)
+    try:
+        driver.find_element(By.XPATH, '//*[@id="main-content"]/section[3]/div[2]/button').click()
+        #WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main-content"]/section[3]/div[2]/button'))).click()
+    except NoSuchElementException:
+        try:
+            driver.find_element(By.XPATH, '//*[@id="main-content"]/section[4]/div[2]/button').click();
+        except NoSuchElementException:
+            print("No extra amenities")
+        except ElementNotInteractableException:
+            print("we're done")
+    
+    #
+    response = driver.page_source
     return response
     
 
