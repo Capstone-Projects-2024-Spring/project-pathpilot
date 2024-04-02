@@ -88,9 +88,9 @@ def parseInsideRequest(response): #returns array of inside info
                # daysArray=[]
                 hoursArray = []
                 for row in table.find_all(class_="css-29kerx"):
-                    #for day in row.find_all(class_="day-of-the-week__09f24__JJea_ css-ux5mu6"):
-                    #    if(day!=None):
-                    #        daysArray.append(day.text)
+                    for day in row.find_all(class_="day-of-the-week__09f24__JJea_ css-1p9ibgf"):
+                        if(day!=None):
+                            hoursArray.append(day.text)
                     for hours in row.find_all(class_="no-wrap__09f24__c3plq css-1p9ibgf"): #working under presumption of Mon-Sun
                         if(hours!=None):
                             hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
