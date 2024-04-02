@@ -1,3 +1,4 @@
+import re
 import unicodedata
 import requests
 import json
@@ -20,11 +21,14 @@ def parseResult(response): #parse result
     num=0
     for i in data1:
         for li in i.find_all("li"):
+            insideURL = ""
             num+=1
             businessArray=[]
             for h3 in li.find_all("h3"):
                 if(h3.text!=None):
                     name = h3.text
+                    if(h3.find('a')!=None):
+                        insideURL= h3.find('a').get('href') #get this business's own URL
                     name = unicodedata.normalize('NFKD', name) #gets rid of html converter issues
                     nameList = name.split(' ')[1:] #uncomment this line if you want to get rid of the numbers on the restaurant title, will affect nearby cities thing
                     name = " ".join(nameList) #put array back together
@@ -47,10 +51,15 @@ def parseResult(response): #parse result
             #    if(buzzWordsClass.text != None):
              #       buzzWord = str(buzzWordsClass.text)
              #       businessArray.append(buzzWord)
+            
+            insideResponse = genInsideURL(insideURL)
+            insideResults = parseInsideRequest(insideResponse)
+            for i in insideResults:
+                businessArray.append(i)
             if businessArray!=[] and businessArray[0]!= "cities":
                 print(businessArray)
-            insideResponse = genInsideURL(businessArray[0])
-            insideResults = parseInsideRequest(insideResponse)
+                print()
+
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
     
@@ -71,15 +80,35 @@ def parseResult(response): #parse result
 
 def parseInsideRequest(response): #returns array of inside info
     data = BeautifulSoup(response.text, 'html.parser')
+    data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
+    extraInfo = []
+    for i in data1:
+        for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
+            for strAddress in locationOuter.find_all(class_ = "raw__09f24__T4Ezm"):
+                if(strAddress!= None): #gets street and zip
+                    extraInfo.append(strAddress.text)
+        for hoursOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
+            for table in hoursOuter.find_all(class_="hours-table__09f24__KR8wh css-n604h6"):
+               # daysArray=[]
+                hoursArray = []
+                for row in table.find_all(class_="css-29kerx"):
+                    #for day in row.find_all(class_="day-of-the-week__09f24__JJea_ css-ux5mu6"):
+                    #    if(day!=None):
+                    #        daysArray.append(day.text)
+                    for hours in row.find_all(class_="no-wrap__09f24__c3plq css-1p9ibgf"):
+                        if(hours!=None):
+                            hoursArray.append(hours.text)
+               # print(daysArray)
+                print(hoursArray)
+    return extraInfo
+            
     #PUT PARSING CODE HERE TO GATHER DATA
     return 
 
 
 
-def genInsideURL(placename):
-    placename = placename.replace(" ", "-")
-    placename = placename.replace("'","")
-    url = f"https://www.yelp.com/biz/{placename}-philadelphia"
+def genInsideURL(insideURL):
+    url = f"https://www.yelp.com/{insideURL}"
     response = requests.get(url)
     return response
     
