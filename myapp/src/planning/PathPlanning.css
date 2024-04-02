@@ -1,1 +1,69 @@
 /* Establishes the UI styling for PathPlanning.js*/
+.main-component {
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+html, body {
+    min-height: 100%;
+}
+
+body {
+   height: 100vh; 
+}
+
+.top-level-component {
+    height: 100vh; 
+}
+
+.output {
+    flex: 70%;
+}
+
+.input {
+    flex: 30%;
+    background-color: rgb(229, 234, 239);
+}
+
+.input-padding {
+    padding: 1rem;
+}
+
+.input-option-select {
+    width: 90%;
+    display: block;
+    margin: auto;
+}
+
+.advanced-options-title {
+    font-style: italic;
+    color: #0000EE;
+}
+
+.advanced-options-title:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.submit-button-container {
+    margin: auto;
+}
+
+.submit-button {
+    color: white;
+    background-color: #4681f4;
+    text-decoration: none;
+    font-size: larger;
+    cursor: pointer;
+    border: none;
+    height: 3rem;
+    width: 20%;
+    border-radius: 4px;
+    display: block;
+    margin: auto;
+}
+
+.bold-text {
+    font-weight: bold;
+}
