@@ -115,10 +115,10 @@ def parseInsideRequest(response): #returns array of inside info
                                 attributeArray.append(attribute)
                             case "No Outdoor Seating":
                                 attributeArray.append(attribute)
-                            case "Classy":
-                                attributeArray.append(attribute)
-                            case "Casual":
-                                attributeArray.append(attribute)
+                            case attribute if "Classy" in attribute and "Classy" not in attributeArray:
+                                attributeArray.append("Classy")
+                            case attribute if "Casual" in attribute and "Casual" not in attributeArray:
+                                attributeArray.append("Casual")
                             case attribute if "Romantic" in attribute:
                                 attributeArray.append("Romantic")
                             case attribute if "Intimate" in attribute and "Romantic" not in attributeArray:
