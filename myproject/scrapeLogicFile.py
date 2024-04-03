@@ -1,3 +1,4 @@
+import cProfile
 import multiprocessing
 import re
 import unicodedata
@@ -19,9 +20,7 @@ def createURL(zipcode, loType):
     return url
 
 def doRequest(url):
-    
     response = requests.get(url)
-    
     parseResult(response)
 
 def parseResult(response): #parse result
@@ -38,15 +37,6 @@ def parseResult(response): #parse result
                         global insideURLArray
                         insideURLArray.append(insideURL) 
                         #get this business's own URL
-            #if(insideURL!=""):
-            #    insideResponse = genInsideURL(insideURL)
-            #    insideResults = parseInsideRequest(insideResponse)
-            #    for i in insideResults:
-            #        businessArray.append(i)
-            #    if businessArray!=[] and businessArray[0]!= "cities":
-             #       print(businessArray)
-            #        print()
-    #print(insideURLArray)
     #MULTIPROCESSING PART
     processes = [] 
     for url in insideURLArray: 
@@ -57,7 +47,7 @@ def parseResult(response): #parse result
         p.join()
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
-    
+#multiprocessing function
 def insideProcess(url):
     insideResponse = genInsideURL(url)
     insideResults = parseInsideRequest(insideResponse)
@@ -67,7 +57,7 @@ def insideProcess(url):
 
 
 
-def parseInsideRequest(response): #returns array of inside info
+def parseInsideRequest(response): #returns all information, from business's own page
     informationDict = {}
     data = BeautifulSoup(response, 'html.parser')
     data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
@@ -159,12 +149,12 @@ def genInsideURL(insideURL):
     url = f"https://www.yelp.com/{insideURL}"
     driver = webdriver.Chrome()
     driver.get(url)
-    driver.implicitly_wait(5)
+    #driver.implicitly_wait(5) #omitting this line saves 10 seconds on 10 locations
     try:
         driver.find_element(By.XPATH, '//*[@id="main-content"]/section[3]/div[2]/button').click()
         #WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main-content"]/section[3]/div[2]/button'))).click()
     except NoSuchElementException:
-        try:
+        try: #sometimes the button is in different spots
             driver.find_element(By.XPATH, '//*[@id="main-content"]/section[4]/div[2]/button').click();
         except NoSuchElementException:
             print("No extra amenities")
@@ -187,7 +177,7 @@ def main():
         # do something here
 
 if __name__ == '__main__':
-    main()
+   cProfile.run('main()', sort='ncalls')
 #url = createURL(19122, "restaurants")
 #numb=0
 #doRequest(url)
