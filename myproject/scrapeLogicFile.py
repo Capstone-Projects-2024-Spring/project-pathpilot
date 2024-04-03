@@ -70,10 +70,10 @@ def parseInsideRequest(response): #returns all information, from business's own 
                 extraInfo.append(name)
         for ratingSect in header.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-v3nuob"):
             for rating in ratingSect.find_all(class_="css-1fdy0l5"):
-                if(rating.text!=None and rating.text!="Unclaimed "): #idk who had the unclaimed issue so both are here to be safe
+                if(rating!=None and rating.text!="Unclaimed "): #idk who had the unclaimed issue so both are here to be safe
                     extraInfo.append(rating.text)
         for price in header.find_all(class_="css-14r9eb"):
-            if(price.text!=None and price.text!="Unclaimed "):
+            if(price!=None and price.text!="Unclaimed "):
                 extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
 
     for i in data1:
@@ -98,7 +98,7 @@ def parseInsideRequest(response): #returns all information, from business's own 
             attributeArray = []
             for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg css-1qn0b6x"):
                 for trait in attributesSection.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
-                    if(trait.text!=None):
+                    if(trait!=None):
                         attribute = trait.text
                         match attribute:
                             case "Not Good For Kids":
