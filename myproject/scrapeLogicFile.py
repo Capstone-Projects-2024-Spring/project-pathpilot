@@ -47,6 +47,7 @@ def parseResult(response): #parse result
              #       print(businessArray)
             #        print()
     #print(insideURLArray)
+    #MULTIPROCESSING PART
     processes = [] 
     for url in insideURLArray: 
         p = multiprocessing.Process(target=insideProcess, args=(url,)) #i dont think we're multiprocessing the right thing
@@ -148,7 +149,6 @@ def parseInsideRequest(response): #returns array of inside info
                             
 
                         
-
     return informationDict
             
     #PUT PARSING CODE HERE TO GATHER DATA 
