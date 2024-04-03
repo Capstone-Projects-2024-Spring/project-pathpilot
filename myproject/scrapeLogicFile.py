@@ -1,3 +1,4 @@
+import multiprocessing
 import re
 import unicodedata
 import requests
@@ -14,7 +15,7 @@ insideURLArray = []
 def createURL(zipcode, loType):
     url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
-    print (url)
+    #print (url)
     return url
 
 def doRequest(url):
@@ -35,30 +36,38 @@ def parseResult(response): #parse result
                     if(h3.find('a')!=None):
                         insideURL= h3.find('a').get('href') 
                         global insideURLArray
-                        insideURLArray.append(insideURL) #SOMETHING IS WRONG< EMPTY URLS, 
+                        insideURLArray.append(insideURL) 
                         #get this business's own URL
-            #for buzzWordsClass in li.find_all(class_="css-11bijt4"): #everyone should get three please
-            #    if(buzzWordsClass.text != None):
-             #       buzzWord = str(buzzWordsClass.text)
-             #       businessArray.append(buzzWord)
-            if(insideURL!=""):
-                insideResponse = genInsideURL(insideURL)
-                insideResults = parseInsideRequest(insideResponse)
-                for i in insideResults:
-                    businessArray.append(i)
-                if businessArray!=[] and businessArray[0]!= "cities":
-                    print(businessArray)
-                    print()
-    print(insideURLArray)
+            #if(insideURL!=""):
+            #    insideResponse = genInsideURL(insideURL)
+            #    insideResults = parseInsideRequest(insideResponse)
+            #    for i in insideResults:
+            #        businessArray.append(i)
+            #    if businessArray!=[] and businessArray[0]!= "cities":
+             #       print(businessArray)
+            #        print()
+    #print(insideURLArray)
+    processes = [] 
+    for url in insideURLArray: 
+        p = multiprocessing.Process(target=insideProcess, args=(url,)) #i dont think we're multiprocessing the right thing
+        p.start() 
+        processes.append(p) 
+    for p in processes: 
+        p.join()
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
     
-    
+def insideProcess(url):
+    insideResponse = genInsideURL(url)
+    insideResults = parseInsideRequest(insideResponse)
+    print(insideResults)
+    print()
     
 
 
 
 def parseInsideRequest(response): #returns array of inside info
+    informationDict = {}
     data = BeautifulSoup(response, 'html.parser')
     data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
     extraInfo = []
@@ -75,8 +84,6 @@ def parseInsideRequest(response): #returns array of inside info
         for price in header.find_all(class_="css-14r9eb"):
             if(price.text!=None and price.text!="Unclaimed "):
                 extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
-
-
 
     for i in data1:
         for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
@@ -95,7 +102,7 @@ def parseInsideRequest(response): #returns array of inside info
                         if(hours!=None):
                             hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
                # print(daysArray)
-                print(hoursArray)
+                #print(hoursArray)
         for attributesTable in i.find_all(class_= "css-ufd2i"):
             attributeArray = []
             for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg css-1qn0b6x"):
@@ -127,13 +134,22 @@ def parseInsideRequest(response): #returns array of inside info
                                 attributeArray.append("Trendy")
                             case attribute if "Trendy" in attribute and "Trendy" not in attributeArray:
                                 attributeArray.append("Trendy")
+               
             if(attributeArray!=[]):
-                print(attributeArray)
+                informationDict = {
+                "information": extraInfo,
+                "attributes": attributeArray,
+                "hours": hoursArray
+            } 
+    
+    
+    #if(attributeArray!=[]):
+    #    informationDict[2] = attributeArray
                             
 
                         
 
-    return extraInfo
+    return informationDict
             
     #PUT PARSING CODE HERE TO GATHER DATA 
 
@@ -163,10 +179,19 @@ def genInsideURL(insideURL):
 
 
 #url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
-url = createURL(19122, "restaurants")
-numb=0
-doRequest(url)
-numb+=1
+def main():
+    url = createURL(19122, "restaurants")
+    numb=0
+    doRequest(url)
+    numb+=1
+        # do something here
+
+if __name__ == '__main__':
+    main()
+#url = createURL(19122, "restaurants")
+#numb=0
+#doRequest(url)
+#numb+=1
 #while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
  #   val = numb*10
 #    tempUrl= url + f"&start={val}"
