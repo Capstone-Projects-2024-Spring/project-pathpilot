@@ -1,7 +1,12 @@
 import React from 'react';
+import SignupInput from './SignupInput.jsx'
 
-const Signup = () => {
-    return null;
+const Login = () => {
+    return(
+        <div className="login-parent">
+            <SignupInput />
+        </div>
+    );
 };
 
-export default Signup;
+export default Login;
