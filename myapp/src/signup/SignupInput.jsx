@@ -6,11 +6,9 @@ const UserInput = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    const submitButtonEnabled = username.length > 0 && password.length > 0;
+    const submitButtonEnabled = username.length > 0 && password.length > 0 && email.length > 0;
 
     const sendAccountToBackend = async () => {
-        console.log("username: "+ username);
-        console.log("password: "+ password);
         try{
             const accountResponse = await CreateUserAccount(username, password, email);
             console.log(accountResponse);
@@ -18,7 +16,6 @@ const UserInput = () => {
             console.log("ERROR")
         }
     }
-
 
     return (
         <div>

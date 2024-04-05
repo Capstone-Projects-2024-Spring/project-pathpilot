@@ -4,24 +4,21 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from myapi.models import Account
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+
 
 @api_view(['GET'])
 def hello_world(request):
     return Response({'message': 'Hello, world!'})
 
 @api_view(['POST'])
-def login_view(request):
+def user_login_attempt(request):
     if request.method == 'POST':
         username = request.data.get('username')
         password = request.data.get('password')
-        print("username: ", username)
-        print("password: ", password)
-
-        get_all_accounts()
-        check_credentials(username, password)
-        #check_credentials("temple", "temple123")
+        
         user = authenticate(username=username, password=password)
-        print("user = ", user)
 
         if user is not None:
             login(request, user)
@@ -31,7 +28,26 @@ def login_view(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+@csrf_exempt
+@api_view(['POST'])
+def user_create_account(request):
+    if request.method == 'POST':
+        # Retrieve data from the request
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
 
+        # Check if username or email already exists
+        if User.objects.filter(username=username).exists():
+            return JsonResponse({'error': 'Username already exists'}, status=400)
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'error': 'Email already exists'}, status=400)
+        
+        # Create the user account
+        user = User.objects.create_user(username=username, email=email, password=password)
+        return JsonResponse({'message': 'User account created successfully'})
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
 
 def check_credentials(username, password):
     try:
@@ -52,9 +68,7 @@ def get_all_accounts():
 
     # Iterate over the queryset and print each account's details
     for account in all_accounts:
-        # print(f"Account ID: {account.id}")
-        # print(f"Email: {account.email}")
-        print("-------------------")
+        print(f"Account ID: {account.id}")
+        print(f"Email: {account.email}")
         print(f"Username: {account.user_name}")
         print(f"password: {account.password}")
-        print("-------------------")
