@@ -1,1 +1,4 @@
 /* Establishes the UI styling for Login.js*/
+.navbar-padding {
+    padding-top: 50px;
+}

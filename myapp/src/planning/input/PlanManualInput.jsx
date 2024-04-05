@@ -107,6 +107,9 @@ const PlanManualInput = ({ updateLocations, updatePath, updateAdvancedOptions })
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             pathData.path ? setPath(pathData.path) : console.log("ERROR");
+
+            pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
+            pathData.path ? updatePath(pathData.path) : console.log("ERROR");
         } catch {
             console.log("ERROR")
         }

@@ -3,7 +3,7 @@ import UserInput from './UserInput.jsx'
 
 const Login = () => {
     return(
-        <div className="login-parent">
+        <div className="navbar-padding">
             <UserInput />
         </div>
     );

@@ -3,7 +3,7 @@ import HelloWorld from './HelloWorld';
 
 function App() {
   return (
-    <div>
+    <div className='navbar-padding'>
       <HelloWorld />
     </div>
   );
