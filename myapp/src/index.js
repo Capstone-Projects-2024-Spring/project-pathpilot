@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import Login from './login/Login.js'
 import PathPlanning from './planning/PathPlanning.js'
-import Navbar from './general/Navbar.jsx';
+import NavbarBoot from './general/Navbar.jsx';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
 import reportWebVitals from './reportWebVitals';
 
@@ -12,7 +12,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <div>
     <Router>
-      <Navbar />
+      <NavbarBoot />
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/Login" element={<Login />} />

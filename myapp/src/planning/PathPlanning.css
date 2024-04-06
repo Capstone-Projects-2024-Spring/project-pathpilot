@@ -17,10 +17,6 @@ body {
     height: 100vh; 
 }
 
-.navbar-padding {
-    padding-top: 50px;
-}
-
 .output {
     flex: 70%;
 }
