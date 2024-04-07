@@ -1,7 +1,11 @@
+from time import sleep
+from random import randint
 import cProfile
+import logging
 import multiprocessing
 import re
 import unicodedata
+import geopy
 import requests
 import json
 from selenium import webdriver
@@ -12,7 +16,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
-from geopy.exc import GeocoderTimedOut
+from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
 insideURLArray = []
 finalRestaurantList = [None] * 10
@@ -199,10 +203,23 @@ def main():
     print(len(finalRestaurantList)) #YAY
     #print(restaurantList)
     print('Here we go')
-    
+    geolocator = Nominatim(user_agent="Geopy Library")
     for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
         address = ', '.join(value['address'])
         print(f"Address for key {key}: {address}")
+        stuff = do_geocode(address)
+        print("Latitude: " + str(stuff.latitude))
+        
+        
+
+def do_geocode(address,attempt=1, max_attempts=5):
+    geolocator = Nominatim(user_agent="Geopy Library")
+    try:
+        return geolocator.geocode(address, timeout=10000)
+    except GeocoderTimedOut:
+        if attempt <= max_attempts:
+            return do_geocode(address, attempt=attempt+1)
+        raise
         
         #fullAddress = ""
         #for part in i.get("address"): #should return list in address key
