@@ -8,8 +8,11 @@ const PlanListOutput = ({ locations }) => {
     return (
         <div>
         {
-            locations.map((place) => 
-                <div>{place}</div>)
+            locations.map((place) =>
+                <div> 
+                    <div>{place.name}</div>
+                    <div>{place.address}</div>
+                </div>)
         }
         </div>
     )
