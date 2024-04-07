@@ -207,15 +207,25 @@ def main():
     for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
         address = ', '.join(value['address'])
         print(f"Address for key {key}: {address}")
-        stuff = do_geocode(address)
-        print("Latitude: " + str(stuff.latitude))
-        
+        adrStuff = do_geocode(address)
+        latitude = adrStuff.latitude
+        longitude = adrStuff.longitude
+        #add them back into dictionary in list
+        value['address'].append(latitude)
+        value['address'].append(longitude)
+        print("Latitude: " + str(latitude))
+        print("Longitude: " + str(longitude))
+        addToDatabase(value) #value is the dictioanry, key is those weird numbers
+        #practice this function by adding things to a 
+
+        #put it back into dictionary list here
+        #send list item (dict) to go to another function that send it into database
         
 
-def do_geocode(address,attempt=1, max_attempts=5):
+def do_geocode(address,attempt=1, max_attempts=5): #recursive so it keeps trying
     geolocator = Nominatim(user_agent="Geopy Library")
     try:
-        return geolocator.geocode(address, timeout=10000)
+        return geolocator.geocode(address, timeout=10000) #timeout lets it keep looking
     except GeocoderTimedOut:
         if attempt <= max_attempts:
             return do_geocode(address, attempt=attempt+1)
