@@ -11,8 +11,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
+from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut
 
 insideURLArray = []
+finalRestaurantList = [None] * 10
+#restaurantList = []
 def createURL(zipcode, loType):
     url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
@@ -39,20 +43,27 @@ def parseResult(response): #parse result
                         #get this business's own URL
     #MULTIPROCESSING PART
     processes = [] 
+    manager = multiprocessing.Manager()
+    restaurantList = manager.dict() #needed to create a shared variable so everyone didnt write on top of each other
     for url in insideURLArray: 
-        p = multiprocessing.Process(target=insideProcess, args=(url,)) #i dont think we're multiprocessing the right thing
+        p = multiprocessing.Process(target=insideProcess, args=(url,restaurantList, insideURLArray.index(url))) #i dont think we're multiprocessing the right thing
         p.start() 
         processes.append(p) 
     for p in processes: 
         p.join()
+    global finalRestaurantList 
+    finalRestaurantList = restaurantList
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
 #multiprocessing function
-def insideProcess(url):
+def insideProcess(url, restaurantList, numOrder):
     insideResponse = genInsideURL(url)
-    insideResults = parseInsideRequest(insideResponse)
-    print(insideResults)
-    print()
+    restaurantDict = parseInsideRequest(insideResponse)
+    if(len(restaurantDict)!=0):
+        restaurantList[numOrder]= restaurantDict.copy() #super list
+        print(restaurantDict)
+        print()
+    print(len(restaurantList))
     
 
 
@@ -77,10 +88,11 @@ def parseInsideRequest(response): #returns all information, from business's own 
                 extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
 
     for i in data1:
+        addressArray = []
         for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
             for strAddress in locationOuter.find_all(class_ = "raw__09f24__T4Ezm"):
                 if(strAddress!= None): #gets street and zip
-                    extraInfo.append(strAddress.text)
+                    addressArray.append(strAddress.text)
         for hoursOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
             for table in hoursOuter.find_all(class_="hours-table__09f24__KR8wh css-n604h6"):
                # daysArray=[]
@@ -129,9 +141,19 @@ def parseInsideRequest(response): #returns all information, from business's own 
             if(attributeArray!=[]):
                 informationDict = {
                 "information": extraInfo,
+                "address": addressArray,
                 "attributes": attributeArray,
                 "hours": hoursArray
             } 
+            #start of database
+            #locationArray = []
+            #for value in informationDict.values():
+             #   for item in value:
+             #       locationArray.append(item)
+            
+
+
+                
     
     
     #if(attributeArray!=[]):
@@ -174,10 +196,27 @@ def main():
     numb=0
     doRequest(url)
     numb+=1
+    print(len(finalRestaurantList)) #YAY
+    #print(restaurantList)
+    print('Here we go')
+    
+    for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
+        address = ', '.join(value['address'])
+        print(f"Address for key {key}: {address}")
+        
+        #fullAddress = ""
+        #for part in i.get("address"): #should return list in address key
+        #    fullAddress.append(part)
+        #print(fullAddress)
         # do something here
 
+
 if __name__ == '__main__':
-   cProfile.run('main()', sort='ncalls')
+   #cProfile.run('main()', sort='ncalls')
+    main()
+    
+
+
 #url = createURL(19122, "restaurants")
 #numb=0
 #doRequest(url)
