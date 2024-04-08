@@ -67,7 +67,7 @@ def insideProcess(url, restaurantList, numOrder):
         restaurantList[numOrder]= restaurantDict.copy() #super list
         print(restaurantDict)
         print()
-    print(len(restaurantList))
+    #print(len(restaurantList))
     
 
 
@@ -213,9 +213,10 @@ def main():
         #add them back into dictionary in list
         value['address'].append(latitude)
         value['address'].append(longitude)
+        print(value['address'])
         print("Latitude: " + str(latitude))
         print("Longitude: " + str(longitude))
-        addToDatabase(value) #value is the dictioanry, key is those weird numbers
+        addtoDatabase(value) #value is the dictioanry, key is those weird numbers
         #practice this function by adding things to a 
 
         #put it back into dictionary list here
@@ -236,6 +237,29 @@ def do_geocode(address,attempt=1, max_attempts=5): #recursive so it keeps trying
         #    fullAddress.append(part)
         #print(fullAddress)
         # do something here
+
+def addtoDatabase(infoDict):
+    databaseArray = []
+    name = infoDict["information"][0]
+    rating = infoDict["information"][1]
+    if(len(infoDict["information"])==3):
+        priceValue = infoDict["information"][2]
+    else:
+        priceValue = -1
+    address = infoDict["address"][0]  + " " + infoDict["address"][1]
+    latitude = infoDict["address"][2]
+    longitude = infoDict["address"][3]
+    if(len(infoDict["attributes"])!=0):
+        attributes = infoDict["attributes"] #convert to json when putting it in there
+    else:
+        attributes = -1
+    zipcode = address[-5]
+    hours = infoDict["hours"] #convert to json later
+    databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
+    print(databaseArray)
+    #structure:
+    # (id, location_name, zip_code, latitude, longitude, street_address, hours_of_op, average_star_rating, location_type_id, attributes, cost)
+    #just put json() around it within the insert line
 
 
 if __name__ == '__main__':
