@@ -59,6 +59,7 @@ def parseResult(response): #parse result
     for p in processes: 
         p.join()
     global finalRestaurantList 
+    insideURLArray = [] #clear the array so we dont rerun businneses, only ten at a time
     finalRestaurantList = restaurantList
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
@@ -199,11 +200,20 @@ def genInsideURL(insideURL):
 
 #url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
 def main():
-    url = createURL(ZIPCODEINPUT, PLACETYPE)
+    #url = createURL(ZIPCODEINPUT, PLACETYPE)
+    #numb=0
+    #doRequest(url)
+    #numb+=1
+    url = createURL(19122, "restaurants")
     numb=0
     doRequest(url)
     numb+=1
-    print(len(finalRestaurantList)) #YAY
+    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+        val = numb*10
+        tempUrl= url + f"&start={val}"
+        doRequest(tempUrl)
+        numb+=1
+    #print(len(finalRestaurantList)) #YAY
     #print(restaurantList)
     print('Here we go')
     geolocator = Nominatim(user_agent="Geopy Library")
