@@ -19,6 +19,8 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
+PLACETYPE = "restaurants"
+ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
@@ -197,7 +199,7 @@ def genInsideURL(insideURL):
 
 #url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
 def main():
-    url = createURL(19122, "restaurants")
+    url = createURL(ZIPCODEINPUT, PLACETYPE)
     numb=0
     doRequest(url)
     numb+=1
@@ -256,12 +258,35 @@ def addtoDatabase(infoDict):
         attributes = -1
     zipcode = address[-5]
     hours = infoDict["hours"] #convert to json later
-    databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
-    print(databaseArray)
+    match PLACETYPE: #expand as wanted
+        case "restaurants":
+            loTypeID = 1
+        case "museums":
+            loTypeID = 2
+        case "restaurants":
+            loTypeID = 1
+        case "coffee+shops":
+            loTypeID = 3
+    #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
+    #print(databaseArray)
+    conn = sqlite3.connect('myproject/db.sqlite3')
+    print("opened database successfully")
+    cursor = conn.cursor()
+    #cursor.execute("create unique index table1timestamp on myapi_location(location_name");
+    cursor.execute("INSERT OR IGNORE INTO myapi_locationtype (location_type) VALUES (?)", (PLACETYPE,)) #put in the location type thing, ignores duplicates
+    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ?", (name,)) #grab the name if its in there already
+    existing_row = cursor.fetchone()
+    if(existing_row == None): #if it isnt in the database already, add it
+        cursor.execute("INSERT INTO myapi_location (location_name, zip_code, latitude, longitude, street_address, hours_of_op, average_star_rating, location_type_id, attributes, cost) VALUES (?,?,?,?,?,?,?,?,?,?)", (name, zipcode, latitude, longitude, address, json.dumps(hours) , rating, loTypeID, json.dumps(attributes), priceValue))
+        conn.commit()
+        print("Added to database successfully")
+    else: #if it is in there, continue on
+        print("data already exists in database")
     #structure:
     # (id, location_name, zip_code, latitude, longitude, street_address, hours_of_op, average_star_rating, location_type_id, attributes, cost)
     #just put json() around it within the insert line
-
+    
+    conn.close() #is it okay to reopen and clsoe for each readdtion or would it be better to open once before running addToDatabase
 
 if __name__ == '__main__':
    #cProfile.run('main()', sort='ncalls')
