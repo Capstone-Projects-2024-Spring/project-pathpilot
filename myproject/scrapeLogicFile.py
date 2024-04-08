@@ -8,6 +8,7 @@ import unicodedata
 import geopy
 import requests
 import json
+import sqlite3
 from selenium import webdriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
