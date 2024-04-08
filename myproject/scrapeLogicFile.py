@@ -30,11 +30,26 @@ def createURL(zipcode, loType):
     #print (url)
     return url
 
-def doRequest(url):
-    response = requests.get(url)
-    parseResult(response)
+def doRequest(url): #raise exceptions if request doesn't work and continue to next page
+    print("hello")
+    try:
+        response = requests.get(url)
+        parseResult(response)
+    except requests.exceptions.HTTPError as errh:
+        #print ("Http Error:",errh)
+        print ("Http Error:")
+    except requests.exceptions.ConnectionError as errc:
+        #print ("Error Connecting:",errc)
+        print ("Error Connecting:")
+    except requests.exceptions.Timeout as errt:
+        #print ("Timeout Error:",errt)
+        print ("Timeout Error:")
+    except requests.exceptions.RequestException as err:
+        #print ("OOps: Something Else",err)
+        print ("OOps: Something Else")
 
 def parseResult(response): #parse result
+    print("Yo")
     data = BeautifulSoup(response.text, 'html.parser')
     data1 = data.find_all("ul")
     for i in data1:
@@ -52,6 +67,7 @@ def parseResult(response): #parse result
     processes = [] 
     manager = multiprocessing.Manager()
     restaurantList = manager.dict() #needed to create a shared variable so everyone didnt write on top of each other
+    print(insideURLArray)
     for url in insideURLArray: 
         p = multiprocessing.Process(target=insideProcess, args=(url,restaurantList, insideURLArray.index(url))) #i dont think we're multiprocessing the right thing
         p.start() 
@@ -60,7 +76,8 @@ def parseResult(response): #parse result
         p.join()
     global finalRestaurantList 
     insideURLArray = [] #clear the array so we dont rerun businneses, only ten at a time
-    finalRestaurantList = restaurantList
+    finalRestaurantList = restaurantList #resets the list
+
             #for item in insideResults:
              #   businessArray.append(item) #add them all to the arrays
 #multiprocessing function
@@ -187,54 +204,17 @@ def genInsideURL(insideURL):
         try: #sometimes the button is in different spots
             driver.find_element(By.XPATH, '//*[@id="main-content"]/section[4]/div[2]/button').click();
         except NoSuchElementException:
-            print("No extra amenities")
+            print("no button")
         except ElementNotInteractableException:
-            print("we're done")
+            print("no button")
+    except ElementNotInteractableException:
+            print("no button")
     
     #
     response = driver.page_source
     return response
-    
 
 
-
-#url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
-def main():
-    #url = createURL(ZIPCODEINPUT, PLACETYPE)
-    #numb=0
-    #doRequest(url)
-    #numb+=1
-    url = createURL(19122, "restaurants")
-    numb=0
-    doRequest(url)
-    numb+=1
-    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
-        val = numb*10
-        tempUrl= url + f"&start={val}"
-        doRequest(tempUrl)
-        numb+=1
-    #print(len(finalRestaurantList)) #YAY
-    #print(restaurantList)
-    print('Here we go')
-    geolocator = Nominatim(user_agent="Geopy Library")
-    for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
-        address = ', '.join(value['address'])
-        print(f"Address for key {key}: {address}")
-        adrStuff = do_geocode(address)
-        latitude = adrStuff.latitude
-        longitude = adrStuff.longitude
-        #add them back into dictionary in list
-        value['address'].append(latitude)
-        value['address'].append(longitude)
-        print(value['address'])
-        print("Latitude: " + str(latitude))
-        print("Longitude: " + str(longitude))
-        addtoDatabase(value) #value is the dictioanry, key is those weird numbers
-        #practice this function by adding things to a 
-
-        #put it back into dictionary list here
-        #send list item (dict) to go to another function that send it into database
-        
 
 def do_geocode(address,attempt=1, max_attempts=5): #recursive so it keeps trying
     geolocator = Nominatim(user_agent="Geopy Library")
@@ -297,6 +277,60 @@ def addtoDatabase(infoDict):
     #just put json() around it within the insert line
     
     conn.close() #is it okay to reopen and clsoe for each readdtion or would it be better to open once before running addToDatabase
+
+#url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
+def main():
+    #url = createURL(ZIPCODEINPUT, PLACETYPE)
+    #numb=0
+    #doRequest(url)
+    #numb+=1
+    url = createURL(19122, "restaurants")
+    numb=0
+    doRequest(url)
+    numb+=1
+    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+        val = numb*10
+        tempUrl= url + f"&start={val}"
+        doRequest(tempUrl)
+        print('Here we go')
+        geolocator = Nominatim(user_agent="Geopy Library")
+        #do this per request run
+        for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
+            address = ', '.join(value['address'])
+            print(f"Address for key {key}: {address}")
+            adrStuff = do_geocode(address)
+            latitude = adrStuff.latitude
+            longitude = adrStuff.longitude
+            #add them back into dictionary in list
+            value['address'].append(latitude)
+            value['address'].append(longitude)
+            print(value['address'])
+            print("Latitude: " + str(latitude))
+            print("Longitude: " + str(longitude))
+            addtoDatabase(value)
+        numb+=1
+    #print(len(finalRestaurantList)) #YAY
+    #print(restaurantList)
+    print('Here we go')
+    #geolocator = Nominatim(user_agent="Geopy Library")
+    #for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
+    #    address = ', '.join(value['address'])
+    #    print(f"Address for key {key}: {address}")
+    #    adrStuff = do_geocode(address)
+    #    latitude = adrStuff.latitude
+    #    longitude = adrStuff.longitude
+    #    #add them back into dictionary in list
+    #    value['address'].append(latitude)
+    #    value['address'].append(longitude)
+    #    print(value['address'])
+    #    print("Latitude: " + str(latitude))
+    #    print("Longitude: " + str(longitude))
+    #    addtoDatabase(value) #value is the dictioanry, key is those weird numbers
+        #practice this function by adding things to a 
+
+        #put it back into dictionary list here
+        #send list item (dict) to go to another function that send it into database
+        
 
 if __name__ == '__main__':
    #cProfile.run('main()', sort='ncalls')
