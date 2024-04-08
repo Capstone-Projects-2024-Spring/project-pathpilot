@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 
 const PlanMapOutput = ({ locations, path }) => {
     const [map, setMap] = useState(null);
-    var markersArray = [];
+    const [markersArray, setMarkersArray] = useState([]);
 
     useEffect(() => {
         async function initMap() {
@@ -26,17 +26,19 @@ const PlanMapOutput = ({ locations, path }) => {
         async function placeMarkers() {
             const google = window.google; 
             const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+            var count = 1;
             locations?.map((place) => 
-                markersArray.push(new AdvancedMarkerElement({
+                setMarkersArray(markersArray => [...markersArray, new AdvancedMarkerElement({
                     map,
+                    content: buildContent(place, count++), //<CustomMarker place={place} />,
                     position: { lat: place.lat, lng: place.lng },
-                }))
+                })])
             );
             /*if(markersArray.length > 0) {
                 console.log(markersArray[0]);
                 markersArray[0].map = null;
             }*/
-            
+
             locations?.map((place) => 
             console.log(place.lat + "," + place.lng)
             );
@@ -50,6 +52,37 @@ const PlanMapOutput = ({ locations, path }) => {
         }
       placeMarkers();
     }, [locations]);
+
+    useEffect(() => {
+        async function removeMarkers() {
+            if(!Array.isArray(locations) && markersArray.length > 0) {
+                markersArray.map((marker) => 
+                    marker.map = null
+                );
+            }
+
+                /*const latitude = 39.9526;
+                const longitude = -75.1652;
+                const pos = {lat : latitude, lng: longitude};
+            const marker = new AdvancedMarkerElement({
+                map,
+                position: pos,
+            }); */
+        }
+      removeMarkers();
+    }, [locations]);
+
+    function buildContent(place, count) {
+        const content = document.createElement("div");
+      
+        content.classList.add("place-marker");
+        content.innerHTML = `
+          <div class="place">
+              <span >${count}</span>
+          </div>
+          `;
+        return content;
+      }
 
 
     return (

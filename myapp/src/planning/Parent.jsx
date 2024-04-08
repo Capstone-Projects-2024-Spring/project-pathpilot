@@ -41,8 +41,7 @@ const Parent = () => {
             <div className='input'>
             {
                 locations ? <div>
-                                <hr></hr>
-                                <PlanListOutput locations={locations} />
+                                <PlanListOutput locations={locations} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} />
                             </div> :
                 <><PlanManualInput updateLocations={updateLocations} updatePath={updatePath} updateAdvancedOptions={updateAdvancedOptions}/>
                     {includeAdvancedOptions ? <div></div> :
