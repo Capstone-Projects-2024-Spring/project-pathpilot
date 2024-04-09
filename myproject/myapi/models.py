@@ -20,8 +20,9 @@ class Location(models.Model):
     longitude = models.FloatField()
     street_address = models.CharField(max_length=255)
     hours_of_op = models.CharField(max_length=255, null=True)
-    reviews_per_star = models.IntegerField(null=True)
     average_star_rating = models.FloatField(null=True)
+    attributes = models.CharField(max_length=255)
+    cost = models.CharField(max_length=5)
 
 class SavedRoute(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
