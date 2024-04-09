@@ -236,7 +236,10 @@ def do_geocode(address,attempt=1, max_attempts=5): #recursive so it keeps trying
 def addtoDatabase(infoDict):
     databaseArray = []
     name = infoDict["information"][0]
-    rating = infoDict["information"][1] #might cause problem if no rating, esp if no rating and no price
+    if(len(infoDict["information"])>1): #if there is more than one item there, we will assume its a rating. No rating likely means also no price
+        rating = infoDict["information"][1] #catch if the only info is 
+    else:
+        rating = -1 #set rating to -1 if there isn't one
     if(len(infoDict["information"])==3):
         priceValue = infoDict["information"][2]
     else:
@@ -250,6 +253,10 @@ def addtoDatabase(infoDict):
             address = infoDict["address"][0]  + " " + infoDict["address"][1] + " " + infoDict["address"][2]
             latitude = infoDict["address"][3]
             longitude = infoDict["address"][4]
+        elif(len(infoDict["address"])==6): #example: ['1800 Arch St', 'Fl 2', 'Comcast Technology Center', 'Philadelphia, PA 19103', -1, -1]
+            address = infoDict["address"][0]  + " " + infoDict["address"][1] + " " + infoDict["address"][2] + " " + infoDict["address"][3]
+            latitude = infoDict["address"][4]
+            longitude = infoDict["address"][5]
     else:
         address=-1
         latitude = infoDict["address"][0]
@@ -263,11 +270,11 @@ def addtoDatabase(infoDict):
     match PLACETYPE: #expand as wanted
         case "restaurants":
             loTypeID = 1
-        case "museums":
+        case "coffee+shops":
             loTypeID = 2
         case "thrift+shop":
             loTypeID = 3
-        case "coffee+shops":
+        case "museums":
             loTypeID = 4
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
@@ -301,6 +308,7 @@ def main():
     doRequest(url)
     numb+=1
     print('Here we go')
+    numb=12 #skip all previous done results
     while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         val = numb*10
         tempUrl= url + f"&start={val}"
