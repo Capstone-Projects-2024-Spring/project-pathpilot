@@ -1,20 +1,18 @@
 import axios from 'axios';
+import { createAccountURL } from '../api/apiConfig.js';
 
-/*
-const CreateUserAccount = async (email, username, password) => {
+export const CreateUserAccount = async (username, password, email) => {
+
     try {
-        const response = await axios.post('https://example.com/api/create-user-account', {
-            email,
+        const response = await axios.post(`${createAccountURL}`, {
             username,
-            password
+            password,
+            email
         });
-
         return response.data;
+
     } catch (error) {
         console.error('Error creating user account:', error.message);
         throw error;
     }
 };
-*/
-
-export default CreateUserAccount;

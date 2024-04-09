@@ -1,17 +1,16 @@
 import axios from 'axios';
-
+import { loginURL } from '../api/apiConfig.js';
 
 export const FetchAccountInfo = async (username, password) => {
-   /* try {
-        const response = await axios.post('https://example.com/api/account', {
+
+    try {
+        const response = await axios.post(`${loginURL}`, {
             username,
             password
         });
-
         return response.data;
     } catch (error) {
         console.error('Error fetching account information:', error.message);
         throw error;
-    }*/
-    return "Temp";
+    }
 };

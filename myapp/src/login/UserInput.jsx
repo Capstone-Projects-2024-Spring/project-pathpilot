@@ -3,8 +3,8 @@ import { FetchAccountInfo } from './FetchAccountInfo.js';
 
 
 const UserInput = () => {
-    const [username, setUsername] = useState([]);
-    const [password, setPassword] = useState([]);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const submitButtonEnabled = username.length > 0 && password.length > 0;
 
     const sendAccountToBackend = async () => {
