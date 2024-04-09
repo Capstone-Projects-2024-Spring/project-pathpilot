@@ -27,7 +27,6 @@ finalRestaurantList = [None] * 10
 def createURL(zipcode, loType):
     url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
-    #print (url)
     return url
 
 def doRequest(url): #raise exceptions if request doesn't work and continue to next page
@@ -280,18 +279,19 @@ def addtoDatabase(infoDict):
 
 #url = "https://www.yelp.com/search?find_desc=restaurants&find_loc=Philadelphia%2C+PA+19122"
 def main():
-    #url = createURL(ZIPCODEINPUT, PLACETYPE)
+    url = createURL(ZIPCODEINPUT, PLACETYPE)
     #numb=0
     #doRequest(url)
     #numb+=1
-    url = createURL(19122, "restaurants")
+    #url = createURL(19122, "restaurants")
     numb=0
     doRequest(url)
     numb+=1
+    print('Here we go')
     while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         val = numb*10
         tempUrl= url + f"&start={val}"
-        doRequest(tempUrl)
+        doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
         print('Here we go')
         geolocator = Nominatim(user_agent="Geopy Library")
         #do this per request run
@@ -311,7 +311,7 @@ def main():
         numb+=1
     #print(len(finalRestaurantList)) #YAY
     #print(restaurantList)
-    print('Here we go')
+    
     #geolocator = Nominatim(user_agent="Geopy Library")
     #for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
     #    address = ', '.join(value['address'])
