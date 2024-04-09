@@ -19,13 +19,13 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "coffee+shops"
+PLACETYPE = "book+stores"
 ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=bookstores"
     print(loType)
     return url
 
@@ -95,6 +95,7 @@ def parseInsideRequest(response): #returns all information, from business's own 
     data = BeautifulSoup(response, 'html.parser')
     data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
     extraInfo = []
+    #print(data1)
     for header in data.find_all(class_="photo-header-content-container__09f24__jDLBB css-1qn0b6x"):
         for name in header.find_all(class_="css-hnttcw"):
             if(name.text!=None):
@@ -108,7 +109,7 @@ def parseInsideRequest(response): #returns all information, from business's own 
         for price in header.find_all(class_="css-14r9eb"):
             if(price!=None and price.text!="Unclaimed "):
                 extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
-
+    print(extraInfo)
     for i in data1:
         addressArray = []
         for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
@@ -163,8 +164,12 @@ def parseInsideRequest(response): #returns all information, from business's own 
                                 attributeArray.append("Trendy")
                             case attribute if "Trendy" in attribute and "Trendy" not in attributeArray:
                                 attributeArray.append("Trendy")
+            if(attributeArray==[]):
+                print('No matching attributes')
+                attributeArray = [-1]
+    
                             
-               
+            
             if(attributeArray!=[]):
                 informationDict = {
                 "information": extraInfo,
@@ -204,15 +209,20 @@ def genInsideURL(insideURL):
         #WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.XPATH, '//*[@id="main-content"]/section[3]/div[2]/button'))).click()
     except NoSuchElementException:
         try: #sometimes the button is in different spots
-            driver.find_element(By.XPATH, '//*[@id="main-content"]/section[4]/div[2]/button').click();
+            driver.find_element(By.XPATH, '//*[@id="main-content"]/section[4]/div[2]/button').click()
         except NoSuchElementException:
-            print("no button")
+            try:
+                print("found it")
+                driver.find_element(By.XPATH, '//*[@id="main-content"]/section[2]/div[2]/button').click() #book stores for some reason
+            except NoSuchElementException:
+                print("no button")
+            except ElementNotInteractableException:
+                print("no clicky")
         except ElementNotInteractableException:
-            print("no button")
+            print("no clicky")
     except ElementNotInteractableException:
-            print("no button")
+            print("no clicky")
     
-    #
     response = driver.page_source
     return response
 
@@ -272,9 +282,9 @@ def addtoDatabase(infoDict):
             loTypeID = 1
         case "coffee+shops":
             loTypeID = 2
-        case "thrift+shop":
-            loTypeID = 3
         case "museums":
+            loTypeID = 3
+        case "book+stores":
             loTypeID = 4
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
@@ -307,9 +317,25 @@ def main():
     numb=0
     doRequest(url)
     numb+=1
+    for key, value in finalRestaurantList.items(): #don't fully get how this works but it works, don't skip first ten!
+            address = ', '.join(value['address'])
+            print(f"Address for key {key}: {address}")
+            adrStuff = do_geocode(address)
+            if(adrStuff!=None): #safety check
+                latitude = adrStuff.latitude
+                longitude = adrStuff.longitude
+            else:
+                latitude = -1
+                longitude = -1
+            #add them back into dictionary in list
+            value['address'].append(latitude)
+            value['address'].append(longitude)
+            print(value['address'])
+            print("Latitude: " + str(latitude))
+            print("Longitude: " + str(longitude))
+            addtoDatabase(value)
     print('Here we go')
-    numb=12 #skip all previous done results
-    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    while(numb<=2 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         val = numb*10
         tempUrl= url + f"&start={val}"
         doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
