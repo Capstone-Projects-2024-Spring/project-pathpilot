@@ -25,7 +25,7 @@ insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=bookstores"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
     return url
 
@@ -95,7 +95,6 @@ def parseInsideRequest(response): #returns all information, from business's own 
     data = BeautifulSoup(response, 'html.parser')
     data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
     extraInfo = []
-    #print(data1)
     for header in data.find_all(class_="photo-header-content-container__09f24__jDLBB css-1qn0b6x"):
         for name in header.find_all(class_="css-hnttcw"):
             if(name.text!=None):
@@ -109,7 +108,6 @@ def parseInsideRequest(response): #returns all information, from business's own 
         for price in header.find_all(class_="css-14r9eb"):
             if(price!=None and price.text!="Unclaimed "):
                 extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
-    print(extraInfo)
     for i in data1:
         addressArray = []
         for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
@@ -335,7 +333,8 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    while(numb<=2 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+        #change up to number based on needs
         val = numb*10
         tempUrl= url + f"&start={val}"
         doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
