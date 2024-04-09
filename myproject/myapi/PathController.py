@@ -66,7 +66,7 @@ class PathController:
         if last_location is None:
 
             # Fetch all locations of specified location type
-            cursor.execute(f"SELECT location_id FROM Locations WHERE location_id = {location_type}")
+            cursor.execute(f"SELECT location_id FROM Locations WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
@@ -85,7 +85,7 @@ class PathController:
         else:
 
             # Fetch the location and latitude of the previous location
-            cursor.execute(f"SELECT location_id, lat, lon FROM Locations WHERE location_id = {last_location}")
+            cursor.execute(f"SELECT location_id, latitude, longitude FROM Locations WHERE location_id = {last_location}")
             previous_location = cursor.fetchone()
             previous_lat = previous_location[1]
             previous_lon = previous_location[2]
@@ -95,7 +95,7 @@ class PathController:
             lon_range = search_radius / PathController.FEET_PER_DEGREE_LON
 
             # Fetch nearby locations within the latitude and longitude ranges
-            cursor.execute(f"SELECT location_id FROM Locations WHERE location_type = {location_type} AND (lat BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (lon BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
+            cursor.execute(f"SELECT location_id FROM Locations WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
             nearby_locations = cursor.fetchall()
 
             # If there are no nearby locations of the specified type, return 0
