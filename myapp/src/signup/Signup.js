@@ -1,7 +1,7 @@
 import React from 'react';
 import SignupInput from './SignupInput.jsx'
 
-const Login = () => {
+const Signup = () => {
     return(
         <div className="login-parent">
             <SignupInput />
@@ -9,4 +9,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Signup;

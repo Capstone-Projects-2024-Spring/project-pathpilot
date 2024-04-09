@@ -17,14 +17,14 @@ def user_login_attempt(request):
     if request.method == 'POST':
         username = request.data.get('username')
         password = request.data.get('password')
-        
+
         user = authenticate(username=username, password=password)
 
         if user is not None:
             login(request, user)
             return JsonResponse({'message': 'Login successful'})
         else:
-            return JsonResponse({'error': 'Invalid username or password'}, status=400)
+            return JsonResponse({'message': 'error: Invalid username or password'})
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
@@ -39,9 +39,9 @@ def user_create_account(request):
 
         # Check if username or email already exists
         if User.objects.filter(username=username).exists():
-            return JsonResponse({'error': 'Username already exists'}, status=400)
+            return JsonResponse({'message': 'error: Username already exists'})
         if User.objects.filter(email=email).exists():
-            return JsonResponse({'error': 'Email already exists'}, status=400)
+            return JsonResponse({'message': 'error: Email already exists'})
         
         # Create the user account
         user = User.objects.create_user(username=username, email=email, password=password)
