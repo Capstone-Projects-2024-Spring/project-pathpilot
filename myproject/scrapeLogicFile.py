@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "restaurants"
+PLACETYPE = "coffee+shops"
 ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
@@ -30,7 +30,6 @@ def createURL(zipcode, loType):
     return url
 
 def doRequest(url): #raise exceptions if request doesn't work and continue to next page
-    print("hello")
     try:
         response = requests.get(url)
         parseResult(response)
@@ -48,7 +47,6 @@ def doRequest(url): #raise exceptions if request doesn't work and continue to ne
         print ("OOps: Something Else")
 
 def parseResult(response): #parse result
-    print("Yo")
     data = BeautifulSoup(response.text, 'html.parser')
     data1 = data.find_all("ul")
     for i in data1:
@@ -149,6 +147,10 @@ def parseInsideRequest(response): #returns all information, from business's own 
                                 attributeArray.append(attribute)
                             case "No Outdoor Seating":
                                 attributeArray.append(attribute)
+                            case "Free Wi-Fi": #added for coffee shops
+                                attributeArray.append(attribute)
+                            case "Quiet" | "Loud" | "Moderate Noise": #added for coffee shops
+                                attributeArray.append(attribute)
                             case attribute if "Classy" in attribute and "Classy" not in attributeArray:
                                 attributeArray.append("Classy")
                             case attribute if "Casual" in attribute and "Casual" not in attributeArray:
@@ -161,6 +163,7 @@ def parseInsideRequest(response): #returns all information, from business's own 
                                 attributeArray.append("Trendy")
                             case attribute if "Trendy" in attribute and "Trendy" not in attributeArray:
                                 attributeArray.append("Trendy")
+                            
                
             if(attributeArray!=[]):
                 informationDict = {
@@ -233,29 +236,39 @@ def do_geocode(address,attempt=1, max_attempts=5): #recursive so it keeps trying
 def addtoDatabase(infoDict):
     databaseArray = []
     name = infoDict["information"][0]
-    rating = infoDict["information"][1]
+    rating = infoDict["information"][1] #might cause problem if no rating, esp if no rating and no price
     if(len(infoDict["information"])==3):
         priceValue = infoDict["information"][2]
     else:
         priceValue = -1
-    address = infoDict["address"][0]  + " " + infoDict["address"][1]
-    latitude = infoDict["address"][2]
-    longitude = infoDict["address"][3]
+    if(infoDict["address"][0] != -1 and infoDict["address"][1]!= -1):
+        if(len(infoDict["address"])==4):
+            address = infoDict["address"][0]  + " " + infoDict["address"][1]
+            latitude = infoDict["address"][2]
+            longitude = infoDict["address"][3]
+        elif(len(infoDict["address"])==5):
+            address = infoDict["address"][0]  + " " + infoDict["address"][1] + " " + infoDict["address"][2]
+            latitude = infoDict["address"][3]
+            longitude = infoDict["address"][4]
+    else:
+        address=-1
+        latitude = infoDict["address"][0]
+        longitude = infoDict["address"][1]
     if(len(infoDict["attributes"])!=0):
         attributes = infoDict["attributes"] #convert to json when putting it in there
     else:
         attributes = -1
-    zipcode = address[-5]
+    zipcode = address[-5:]
     hours = infoDict["hours"] #convert to json later
     match PLACETYPE: #expand as wanted
         case "restaurants":
             loTypeID = 1
         case "museums":
             loTypeID = 2
-        case "restaurants":
-            loTypeID = 1
-        case "coffee+shops":
+        case "thrift+shop":
             loTypeID = 3
+        case "coffee+shops":
+            loTypeID = 4
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
@@ -299,8 +312,12 @@ def main():
             address = ', '.join(value['address'])
             print(f"Address for key {key}: {address}")
             adrStuff = do_geocode(address)
-            latitude = adrStuff.latitude
-            longitude = adrStuff.longitude
+            if(adrStuff!=None): #safety check
+                latitude = adrStuff.latitude
+                longitude = adrStuff.longitude
+            else:
+                latitude = -1
+                longitude = -1
             #add them back into dictionary in list
             value['address'].append(latitude)
             value['address'].append(longitude)
