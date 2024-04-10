@@ -308,9 +308,9 @@ def addtoDatabase(infoDict):
     conn = sqlite3.connect('myproject/db.sqlite3')
     print("opened database successfully")
     cursor = conn.cursor()
-    #cursor.execute("create unique index table1timestamp on myapi_location(location_name");
     cursor.execute("INSERT OR IGNORE INTO myapi_locationtype (location_type) VALUES (?)", (PLACETYPE,)) #put in the location type thing, ignores duplicates
-    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ?", (name,)) #grab the name if its in there already
+    
+    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ? AND street_address = ?", (name, address,)) #grab the name if its in there already
     existing_row = cursor.fetchone()
     if(existing_row == None): #if it isnt in the database already, add it
         cursor.execute("INSERT INTO myapi_location (location_name, zip_code, latitude, longitude, street_address, hours_of_op, average_star_rating, location_type_id, attributes, cost) VALUES (?,?,?,?,?,?,?,?,?,?)", (name, zipcode, latitude, longitude, address, json.dumps(hours) , rating, loTypeID, json.dumps(attributes), priceValue))
@@ -352,32 +352,32 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    #while(numb<=9 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    while(numb<=9 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
-     #   val = numb*10
-     #   tempUrl= url + f"&start={val}"
-     #   doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
-     #   print('Here we go')
-     #   geolocator = Nominatim(user_agent="Geopy Library")
+        val = numb*10
+        tempUrl= url + f"&start={val}"
+        doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
+        print('Here we go')
+        geolocator = Nominatim(user_agent="Geopy Library")
         #do this per request run
-     #   for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
-     #       address = ', '.join(value['address'])
-     #       print(f"Address for key {key}: {address}")
-     #       adrStuff = do_geocode(address)
-     #      if(adrStuff!=None): #safety check
-     #           latitude = adrStuff.latitude
-     #           longitude = adrStuff.longitude
-     #       else:
-     #           latitude = -1
-     #           longitude = -1
+        for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
+            address = ', '.join(value['address'])
+            print(f"Address for key {key}: {address}")
+            adrStuff = do_geocode(address)
+            if(adrStuff!=None): #safety check
+                latitude = adrStuff.latitude
+                longitude = adrStuff.longitude
+            else:
+                latitude = -1
+                longitude = -1
             #add them back into dictionary in list
-     #       value['address'].append(latitude)
-     #       value['address'].append(longitude)
-     #       print(value['address'])
-     #       print("Latitude: " + str(latitude))
-     #       print("Longitude: " + str(longitude))
-     #       addtoDatabase(value)
-     #   numb+=1
+            value['address'].append(latitude)
+            value['address'].append(longitude)
+            print(value['address'])
+            print("Latitude: " + str(latitude))
+            print("Longitude: " + str(longitude))
+            addtoDatabase(value)
+        numb+=1
     #print(len(finalRestaurantList)) #YAY
     #print(restaurantList)
     
