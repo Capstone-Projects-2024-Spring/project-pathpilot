@@ -16,28 +16,28 @@ class PathController:
     def calculateReasonableRoute(self, location_types):
 
         # Initialize variables
-        route = []
+        route_ids = []
         attempted_starting_locations = set()
         search_radius = PathController.INITIAL_SEARCH_RADIUS
         last_location = None
 
         # Continue until the route includes locations for all location types
-        while len(route) != len(location_types):
+        while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route)], attempted_starting_locations, search_radius, last_location)
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
-                    route.append(location_id)
+                    route_ids.append(location_id)
                     last_location = location_id
 
                 # If no nearby location is found, backtrack to previous location
                 elif location_id == 0:
-                    location_id = route.pop()
+                    location_id = route_ids.pop()
 
                     # If the starting location can not be used for a reasonable route with the current search radius, mark it as attempted
-                    if len(route) == 0:
+                    if len(route_ids) == 0:
                         attempted_starting_locations.add(location_id)
 
                 # If there are no more valid starting locations, broaden the search radius and retry all attempted starting locations
@@ -49,10 +49,14 @@ class PathController:
                     if search_radius > PathController.SEARCH_RADIUS_LIMIT:
                         return None
 
-        # Return the calculated route
-        return route
-    
+        # Return the calculated route as a list of locations w/ all information included
+        reasonable_route = []
+        for location_id in route_ids:
+            location_data = self.fetch_location_data(location_id)
+            reasonable_route.append(location_data)
 
+        return reasonable_route
+    
     # This function returns a random LocationID from the Locations table that has the associated LocationType
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
@@ -106,6 +110,12 @@ class PathController:
             else:
                 random_location = random.choice(nearby_locations)
                 return random_location[0]
+            
+    def fetch_location_data(self, location_id):
+        cursor = self.conn.cursor()
+        cursor.execute(f"SELECT * FROM myapi_location WHERE id = {location_id}")
+        location_data = cursor.fetchone()
+        return location_data
 
     def favoriteRoute(route):
         pass
