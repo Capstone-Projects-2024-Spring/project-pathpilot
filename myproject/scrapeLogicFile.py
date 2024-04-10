@@ -19,13 +19,13 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "book+stores"
+PLACETYPE = "ice+cream"
 ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=icecream"
     print(loType)
     return url
 
@@ -127,12 +127,17 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
                # print(daysArray)
                 #print(hoursArray)
+        numTraits=0
         for attributesTable in i.find_all(class_= "css-ufd2i"):
             attributeArray = []
             for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg css-1qn0b6x"):
                 for trait in attributesSection.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
                     if(trait!=None):
+                        numTraits+=1
                         attribute = trait.text
+                        #we were skipping ones that had no matching attributes, fix that by putting -1 in everybody
+                        if(numTraits==1):
+                            attributeArray.append(-1) #add it anyway
                         match attribute:
                             case "Not Good For Kids":
                                 attributeArray.append(attribute)
@@ -145,6 +150,8 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             case "Outdoor Seating":
                                 attributeArray.append(attribute)
                             case "No Outdoor Seating":
+                                attributeArray.append(attribute)
+                            case "Dairy-Free Options": #added for ice cream shops
                                 attributeArray.append(attribute)
                             case "Free Wi-Fi": #added for coffee shops
                                 attributeArray.append(attribute)
@@ -162,9 +169,11 @@ def parseInsideRequest(response): #returns all information, from business's own 
                                 attributeArray.append("Trendy")
                             case attribute if "Trendy" in attribute and "Trendy" not in attributeArray:
                                 attributeArray.append("Trendy")
-            if(attributeArray==[]):
-                print('No matching attributes')
-                attributeArray = [-1]
+                            #case attribute if "Estimated Health Score" in attribute:
+                            #    attributeArray.append("Trendy")
+                            case "Accepts Credit Cards":
+                                attributeArray.append(attribute)
+                
     
                             
             
@@ -174,7 +183,8 @@ def parseInsideRequest(response): #returns all information, from business's own 
                 "address": addressArray,
                 "attributes": attributeArray,
                 "hours": hoursArray
-            } 
+                } 
+             
             #start of database
             #locationArray = []
             #for value in informationDict.values():
@@ -253,6 +263,10 @@ def addtoDatabase(infoDict):
     else:
         priceValue = -1
     if(infoDict["address"][0] != -1 and infoDict["address"][1]!= -1):
+        if(len(infoDict["address"])==3): #example: ['Philadelphia, PA 19122', 39.9527237, -75.1635262] it's a fake lat and long so we don't want it
+            address = infoDict["address"][0]
+            latitude = -1
+            longitude = -1
         if(len(infoDict["address"])==4):
             address = infoDict["address"][0]  + " " + infoDict["address"][1]
             latitude = infoDict["address"][2]
@@ -273,7 +287,10 @@ def addtoDatabase(infoDict):
         attributes = infoDict["attributes"] #convert to json when putting it in there
     else:
         attributes = -1
-    zipcode = address[-5:]
+    if(address!=-1):
+        zipcode = address[-5:]
+    else:
+        zipcode = -1
     hours = infoDict["hours"] #convert to json later
     match PLACETYPE: #expand as wanted
         case "restaurants":
@@ -284,6 +301,8 @@ def addtoDatabase(infoDict):
             loTypeID = 3
         case "book+stores":
             loTypeID = 4
+        case "ice+cream":
+            loTypeID = 5
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
@@ -333,32 +352,32 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    #while(numb<=9 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
-        val = numb*10
-        tempUrl= url + f"&start={val}"
-        doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
-        print('Here we go')
-        geolocator = Nominatim(user_agent="Geopy Library")
+     #   val = numb*10
+     #   tempUrl= url + f"&start={val}"
+     #   doRequest(tempUrl) #each of these is a big guy (outer and 10 inner), so we should add to database after
+     #   print('Here we go')
+     #   geolocator = Nominatim(user_agent="Geopy Library")
         #do this per request run
-        for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
-            address = ', '.join(value['address'])
-            print(f"Address for key {key}: {address}")
-            adrStuff = do_geocode(address)
-            if(adrStuff!=None): #safety check
-                latitude = adrStuff.latitude
-                longitude = adrStuff.longitude
-            else:
-                latitude = -1
-                longitude = -1
+     #   for key, value in finalRestaurantList.items(): #don't fully get how this works but it works
+     #       address = ', '.join(value['address'])
+     #       print(f"Address for key {key}: {address}")
+     #       adrStuff = do_geocode(address)
+     #      if(adrStuff!=None): #safety check
+     #           latitude = adrStuff.latitude
+     #           longitude = adrStuff.longitude
+     #       else:
+     #           latitude = -1
+     #           longitude = -1
             #add them back into dictionary in list
-            value['address'].append(latitude)
-            value['address'].append(longitude)
-            print(value['address'])
-            print("Latitude: " + str(latitude))
-            print("Longitude: " + str(longitude))
-            addtoDatabase(value)
-        numb+=1
+     #       value['address'].append(latitude)
+     #       value['address'].append(longitude)
+     #       print(value['address'])
+     #       print("Latitude: " + str(latitude))
+     #       print("Longitude: " + str(longitude))
+     #       addtoDatabase(value)
+     #   numb+=1
     #print(len(finalRestaurantList)) #YAY
     #print(restaurantList)
     
