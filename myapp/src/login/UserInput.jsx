@@ -8,11 +8,15 @@ const UserInput = () => {
     const [password, setPassword] = useState('');
     const submitButtonEnabled = username.length > 0 && password.length > 0;
 
+
     const sendAccountToBackend = async () => {
         console.log("username: "+ username);
         console.log("password: "+ password);
         try{
             const accountResponse = await FetchAccountInfo(username, password);
+            if(accountResponse.message.includes("successful")) {
+                window.open('/planning');
+            }
             console.log(accountResponse);
         } catch {
             console.log("ERROR")

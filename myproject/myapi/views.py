@@ -22,7 +22,7 @@ def user_login_attempt(request):
 
         if user is not None:
             login(request, user)
-            return JsonResponse({'message': 'Login successful'})
+            return JsonResponse({'message': 'Login successful', 'user': username})
         else:
             return JsonResponse({'message': 'error: Invalid username or password'})
     else:

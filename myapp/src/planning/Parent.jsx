@@ -43,7 +43,9 @@ const Parent = () => {
                     includeAdvancedOptions ? <div></div> :
                         <div>
                             <hr></hr>
-                            <PlanningWelcome />
+                            {
+                                localStorage.getItem("username") ? <div>test</div> : <PlanningWelcome />
+                            }
                         </div>
                 }
             </div>
