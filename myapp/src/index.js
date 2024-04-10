@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import HomePage from './home/HomePage.js';
 import Login from './login/Login.js'
 import Signup from './signup/Signup.js'
 import PathPlanning from './planning/PathPlanning.js'
@@ -13,7 +14,7 @@ root.render(
   <div>
     <Router>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
         <Route path='/Planning' element={<PathPlanning />} />
