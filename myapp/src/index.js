@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import Login from './login/Login.js'
+import Signup from './signup/Signup.js'
 import PathPlanning from './planning/PathPlanning.js'
 import NavbarBoot from './general/Navbar.jsx';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
@@ -16,6 +17,7 @@ root.render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
         <Route path='/Planning' element={<PathPlanning />} />
       </Routes>
     </Router>
