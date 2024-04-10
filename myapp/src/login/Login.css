@@ -1,4 +1,92 @@
 /* Establishes the UI styling for Login.js*/
-.navbar-padding {
-    padding-top: 50px;
+html, body {
+    min-height: 100%;
+}
+
+body {
+   height: 100vh; 
+}
+
+.main-login {
+    height: 100vh; 
+}
+
+.login-parent-container {
+    padding-top: 3rem;
+    background-color: rgb(229, 234, 239);
+    min-height: 100%;
+}
+
+.login-parent {
+    margin: auto;
+    background-color: white;
+    width: 30%;
+    padding: 3rem;
+    box-shadow: 5px 5px 10px 2px rgba(0, 0, 0, 0.511);
+}
+
+.login-logo {
+    width: 75%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-welcome {
+    font-weight: bold;
+    font-size: larger;
+    margin: auto;
+}
+
+.login-redirect-text {
+    text-align: center;
+    font-size: small;
+    padding-top: 1rem;
+}
+
+.input-field {
+    padding-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.login-input {
+    width: 90%;
+    font-size: large;
+}
+
+.login-submit-container {
+    padding-top: 1rem;
+    padding-left: 2rem;
+}
+
+.login-submit {
+    color: white;
+    background-color: #4681f4;
+    text-decoration: none;
+    font-size: larger;
+    border: none;
+    height: 2rem;
+    width: 92%;
+    border-radius: 4px;
+}
+
+.login-submit:hover:enabled {
+    background-color: #386acf;
+    cursor: pointer;
+}
+
+.login-submit:disabled {
+    background-color: #2e58ab;
+    color: rgb(202, 202, 202);
+}
+
+.login-explanation {
+    font-weight: bold;
+    text-align: center;
+    padding-top: 2rem;
+    font-size: large;
+}
+
+.guest-link:hover {
+    color: black;
 }

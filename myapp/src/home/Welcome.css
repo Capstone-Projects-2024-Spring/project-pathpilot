@@ -1,1 +1,93 @@
 /* Establishes the UI styling for Welcome.jsx*/
+
+.main-welcome-component {
+    margin: auto;
+    background-color: azure;
+}
+.logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 700px;
+}
+
+.welcome-header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 5rem;
+    width: 50%;
+    margin: auto;
+}
+
+.redirect-button-container {
+    margin: auto;
+    width: 50%;
+    padding-top: 1rem;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.redirect-button {
+    color: white;
+    background-color: #4681f4;
+    text-decoration: none;
+    font-size: larger;
+    cursor: pointer;
+    border: none;
+    height: 3rem;
+    width: 120px;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 4px;
+    display: block;
+    margin: auto;
+}
+
+.redirect-button:hover {
+    background-color: #386acf;
+}
+
+.redirect-link {
+    width: 100px;
+}
+
+.welcome-text-header {
+    text-align: center;
+    margin: auto;
+    font-weight: bold;
+    font-size: xx-large;
+    color: black;
+    width: 80%;
+    padding-bottom: 10px;
+    padding-top: 1rem;
+}
+
+.welcome-text {
+    text-align: center;
+    margin: auto;
+    font-size: large;
+    width: 80%;
+    padding-bottom: 20px;
+}
+
+.get-started {
+    text-align: center;
+    background-color: rgb(229, 234, 239);
+}
+
+.get-started-text {
+    padding-top: 1rem;
+    padding-bottom: 10px;
+    font-weight: bold;
+    font-size: larger;
+}
+
+.guest-link {
+    font-style: italic;
+    font-size: larger;
+}
+
+.guest-link-container {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}

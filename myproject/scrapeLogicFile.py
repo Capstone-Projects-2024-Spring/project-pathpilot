@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "book+stores"
+PLACETYPE = "museums"
 ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
@@ -127,12 +127,17 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
                # print(daysArray)
                 #print(hoursArray)
+        numTraits=0
         for attributesTable in i.find_all(class_= "css-ufd2i"):
             attributeArray = []
             for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg css-1qn0b6x"):
                 for trait in attributesSection.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
                     if(trait!=None):
+                        numTraits+=1
                         attribute = trait.text
+                        #we were skipping ones that had no matching attributes, fix that by putting -1 in everybody
+                        if(numTraits==1):
+                            attributeArray.append(-1) #add it anyway
                         match attribute:
                             case "Not Good For Kids":
                                 attributeArray.append(attribute)
@@ -145,6 +150,8 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             case "Outdoor Seating":
                                 attributeArray.append(attribute)
                             case "No Outdoor Seating":
+                                attributeArray.append(attribute)
+                            case "Dairy-Free Options": #added for ice cream shops
                                 attributeArray.append(attribute)
                             case "Free Wi-Fi": #added for coffee shops
                                 attributeArray.append(attribute)
@@ -162,9 +169,11 @@ def parseInsideRequest(response): #returns all information, from business's own 
                                 attributeArray.append("Trendy")
                             case attribute if "Trendy" in attribute and "Trendy" not in attributeArray:
                                 attributeArray.append("Trendy")
-            if(attributeArray==[]):
-                print('No matching attributes')
-                attributeArray = [-1]
+                            #case attribute if "Estimated Health Score" in attribute:
+                            #    attributeArray.append("Trendy")
+                            case "Accepts Credit Cards":
+                                attributeArray.append(attribute)
+                
     
                             
             
@@ -174,7 +183,8 @@ def parseInsideRequest(response): #returns all information, from business's own 
                 "address": addressArray,
                 "attributes": attributeArray,
                 "hours": hoursArray
-            } 
+                } 
+             
             #start of database
             #locationArray = []
             #for value in informationDict.values():
@@ -243,7 +253,10 @@ def do_geocode(address,attempt=1, max_attempts=5): #recursive so it keeps trying
 
 def addtoDatabase(infoDict):
     databaseArray = []
-    name = infoDict["information"][0]
+    if(len(infoDict["information"])!=0): # penitentary (if no picture)
+        name = infoDict["information"][0]
+    else:
+        name = -1
     if(len(infoDict["information"])>1): #if there is more than one item there, we will assume its a rating. No rating likely means also no price
         rating = infoDict["information"][1] #catch if the only info is 
     else:
@@ -253,6 +266,10 @@ def addtoDatabase(infoDict):
     else:
         priceValue = -1
     if(infoDict["address"][0] != -1 and infoDict["address"][1]!= -1):
+        if(len(infoDict["address"])==3): #example: ['Philadelphia, PA 19122', 39.9527237, -75.1635262] it's a fake lat and long so we don't want it
+            address = infoDict["address"][0]
+            latitude = -1
+            longitude = -1
         if(len(infoDict["address"])==4):
             address = infoDict["address"][0]  + " " + infoDict["address"][1]
             latitude = infoDict["address"][2]
@@ -273,7 +290,10 @@ def addtoDatabase(infoDict):
         attributes = infoDict["attributes"] #convert to json when putting it in there
     else:
         attributes = -1
-    zipcode = address[-5:]
+    if(address!=-1):
+        zipcode = address[-5:]
+    else:
+        zipcode = -1
     hours = infoDict["hours"] #convert to json later
     match PLACETYPE: #expand as wanted
         case "restaurants":
@@ -284,14 +304,16 @@ def addtoDatabase(infoDict):
             loTypeID = 3
         case "book+stores":
             loTypeID = 4
+        case "ice+cream":
+            loTypeID = 5
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
     print("opened database successfully")
     cursor = conn.cursor()
-    #cursor.execute("create unique index table1timestamp on myapi_location(location_name");
     cursor.execute("INSERT OR IGNORE INTO myapi_locationtype (location_type) VALUES (?)", (PLACETYPE,)) #put in the location type thing, ignores duplicates
-    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ?", (name,)) #grab the name if its in there already
+    
+    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ? AND street_address = ?", (name, address,)) #grab the name if its in there already
     existing_row = cursor.fetchone()
     if(existing_row == None): #if it isnt in the database already, add it
         cursor.execute("INSERT INTO myapi_location (location_name, zip_code, latitude, longitude, street_address, hours_of_op, average_star_rating, location_type_id, attributes, cost) VALUES (?,?,?,?,?,?,?,?,?,?)", (name, zipcode, latitude, longitude, address, json.dumps(hours) , rating, loTypeID, json.dumps(attributes), priceValue))
@@ -333,7 +355,7 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    while(numb<=3 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
         tempUrl= url + f"&start={val}"
