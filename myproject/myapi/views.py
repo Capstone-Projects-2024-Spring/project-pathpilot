@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
+from myapi.PathController import PathController
 from myapi.models import Account
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
@@ -46,6 +47,22 @@ def user_create_account(request):
         # Create the user account
         user = User.objects.create_user(username=username, email=email, password=password)
         return JsonResponse({'message': 'User account created successfully'})
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+@api_view(['POST'])
+def calculate_path(request):
+    if request.method == 'POST':
+        location_types = request.data.get('locationTypes')
+
+        path_controller = PathController()
+        route = path_controller.calculateReasonableRoute(location_types)
+
+        if route:
+            return JsonResponse({'route': route})
+        else:
+            # Handle the case where no route could be calculated
+            return JsonResponse({'error': 'Failed to calculate route'}, status=400)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 

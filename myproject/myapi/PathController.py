@@ -45,9 +45,9 @@ class PathController:
                     search_radius += 1000
                     attempted_starting_locations.clear()
 
-                    # If search radius exceeds limit, return error
+                    # If search radius exceeds limit, return None
                     if search_radius > PathController.SEARCH_RADIUS_LIMIT:
-                        return "Error"
+                        return None
 
         # Return the calculated route
         return route
