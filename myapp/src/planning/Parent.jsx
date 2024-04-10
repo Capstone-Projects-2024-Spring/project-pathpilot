@@ -1,6 +1,7 @@
 import React from 'react';
 import {useState} from 'react';
-import PlanOutput from './output/PlanOutput'; 
+import PlanMapOutput from './output/PlanMapOutput'; 
+import PlanListOutput from './output/PlanListOutput';
 import PlanManualInput from './input/PlanManualInput';
 import PlanningWelcome from './PlanningWelcome';
 import './PathPlanning.css';
@@ -35,19 +36,24 @@ const Parent = () => {
     return (
         <div className='main-component'>
             <div className='output'>
-                <PlanOutput locations={locations} path={path}/>
+                <PlanMapOutput locations={locations} path={path}/>
             </div>
             <div className='input'>
-                <PlanManualInput updateLocations={updateLocations} updatePath={updatePath} updateAdvancedOptions={updateAdvancedOptions}/>
-                {
-                    includeAdvancedOptions ? <div></div> :
+            {
+                locations ? <div>
+                                <PlanListOutput locations={locations} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} />
+                            </div> :
+                <><PlanManualInput updateLocations={updateLocations} updatePath={updatePath} updateAdvancedOptions={updateAdvancedOptions}/>
+                    {includeAdvancedOptions ? <div></div> :
                         <div>
                             <hr></hr>
                             {
                                 localStorage.getItem("username") ? <div>test</div> : <PlanningWelcome />
                             }
                         </div>
-                }
+                    }
+                </>
+            }
             </div>
         </div>
     )
