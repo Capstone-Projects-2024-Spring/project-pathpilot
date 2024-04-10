@@ -5,11 +5,13 @@ import './Login.css';
 
 const Login = () => {
     return(
+        <div className='main-login'>
         <div className="login-parent-container">
             <div className='login-parent'>
                 <LoginWelcome />
                 <UserInput />
             </div>
+        </div>
         </div>
     );
 }

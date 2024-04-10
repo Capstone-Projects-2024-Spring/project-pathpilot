@@ -23,11 +23,11 @@ const UserInput = () => {
     return (
         <div>
             <div className='input-field'>
-                Username
+                <div className='input-label'>Username</div>
                 <input onChange = {e => setUsername(e.target.value)} placeholder='Username' className='login-input'></input>
             </div>
             <div className='input-field'>
-                Password
+                <div className='input-label'>Password</div>
                 <input onChange = {e => setPassword(e.target.value)} placeholder='Password' className='login-input'></input>
             </div>
             <div className='login-submit-container'>
@@ -35,6 +35,7 @@ const UserInput = () => {
             </div>
             <div className='login-redirect-text'>
                 <Link className='guest-link' to='/planning'>Sign in as guest</Link>
+                <br></br>
                 <br></br>
                 <Link className='guest-link' to='/signup'>Don't have an account, sign up here</Link>
             </div>
