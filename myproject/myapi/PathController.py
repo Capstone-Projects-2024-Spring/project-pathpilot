@@ -119,3 +119,15 @@ class PathController:
 
     def favoriteRoute(route):
         pass
+
+# Simple Algorithm Test
+    
+location_types=[1,2,3]
+
+path_controller = PathController()
+route = path_controller.calculateReasonableRoute(location_types)
+
+if route:
+    print(route)
+else:
+    print("route error")

@@ -51,7 +51,7 @@ def user_create_account(request):
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
 @api_view(['POST'])
-def calculate_path(request):
+def calculate_route(request):
     if request.method == 'POST':
         location_types = request.data.get('locationTypes')
 
