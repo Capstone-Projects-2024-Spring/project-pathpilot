@@ -11,7 +11,7 @@ class PathController:
     FEET_PER_DEGREE_LON = 288200
 
     def __init__(self):
-        self.conn = sqlite3.connect('myproject/db.sqlite3')
+        self.conn = sqlite3.connect('../db.sqlite3')
 
     def calculateReasonableRoute(self, location_types):
 
@@ -25,7 +25,7 @@ class PathController:
         while len(route) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(self, location_types[len(route)], attempted_starting_locations, search_radius, last_location)
+                location_id = self.fetch_random_location(location_types[len(route)], attempted_starting_locations, search_radius, last_location)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -66,7 +66,7 @@ class PathController:
         if last_location is None:
 
             # Fetch all locations of specified location type
-            cursor.execute(f"SELECT location_id FROM Locations WHERE location_type_id = {location_type}")
+            cursor.execute(f"SELECT id FROM myapi_location WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
@@ -85,17 +85,17 @@ class PathController:
         else:
 
             # Fetch the location and latitude of the previous location
-            cursor.execute(f"SELECT location_id, latitude, longitude FROM Locations WHERE location_id = {last_location}")
+            cursor.execute(f"SELECT latitude, longitude FROM myapi_location WHERE id = {last_location}")
             previous_location = cursor.fetchone()
-            previous_lat = previous_location[1]
-            previous_lon = previous_location[2]
+            previous_lat = previous_location[0]
+            previous_lon = previous_location[1]
 
             # Calculate latitude and longitude ranges within the search radius
             lat_range = search_radius / PathController.FEET_PER_DEGREE_LAT
             lon_range = search_radius / PathController.FEET_PER_DEGREE_LON
 
             # Fetch nearby locations within the latitude and longitude ranges
-            cursor.execute(f"SELECT location_id FROM Locations WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
+            cursor.execute(f"SELECT id FROM myapi_location WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
             nearby_locations = cursor.fetchall()
 
             # If there are no nearby locations of the specified type, return 0
