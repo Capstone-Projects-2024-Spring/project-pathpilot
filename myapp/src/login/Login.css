@@ -1,1 +1,71 @@
 /* Establishes the UI styling for Login.js*/
+
+body {
+    background-color: rgb(229, 234, 239);
+}
+
+.login-parent-container {
+    padding-top: 3rem;
+}
+
+.login-parent {
+    margin: auto;
+    background-color: white;
+    width: 30%;
+    padding: 3rem;
+}
+
+.login-logo {
+    width: 75%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-welcome {
+    font-weight: bold;
+    font-size: larger;
+    margin: auto;
+}
+
+.login-redirect-text {
+    text-align: center;
+    font-size: small;
+    padding-top: 1rem;
+}
+
+.input-field {
+    padding-bottom: 1rem;
+}
+
+.login-input {
+    width: 90%;
+    font-size: medium;
+}
+
+.login-submit-container {
+    padding-top: 1rem;
+}
+
+.login-submit {
+    color: white;
+    background-color: #4681f4;
+    text-decoration: none;
+    font-size: larger;
+    cursor: pointer;
+    border: none;
+    height: 2rem;
+    width: 92%;
+    border-radius: 4px;
+}
+
+.login-submit:hover {
+    background-color: #386acf;
+}
+
+.login-explanation {
+    font-weight: bold;
+    text-align: center;
+    padding-top: 2rem;
+    font-size: large;
+}
