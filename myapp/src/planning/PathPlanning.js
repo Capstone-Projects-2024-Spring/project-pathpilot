@@ -4,7 +4,7 @@ import PlanningWelcome from './PlanningWelcome.jsx'
 
 const PathPlanning = () => {
     return (
-        <div className='top-level-component'>
+        <div className='top-level-component navbar-padding'>
             <Parent/>
         </div>
     )

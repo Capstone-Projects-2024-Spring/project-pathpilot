@@ -6,6 +6,7 @@ import HomePage from './home/HomePage.js';
 import Login from './login/Login.js'
 import Signup from './signup/Signup.js'
 import PathPlanning from './planning/PathPlanning.js'
+import NavbarBoot from './general/Navbar.jsx';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
 import reportWebVitals from './reportWebVitals';
 
@@ -13,6 +14,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <div>
     <Router>
+      <NavbarBoot />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/Login" element={<Login />} />

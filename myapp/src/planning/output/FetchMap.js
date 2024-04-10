@@ -16,4 +16,4 @@ const FetchMap = async (locations, polyline) => {
 };
 */
 
-export default FetchMap;
+//export default FetchMap;
