@@ -5,6 +5,7 @@ import PlanListOutput from './output/PlanListOutput';
 import PlanManualInput from './input/PlanManualInput';
 import PlanningWelcome from './PlanningWelcome';
 import './PathPlanning.css';
+import LoginWelcomeAuthenticated from './LoginWelcomAuthenticated';
 
 const Parent = () => {
     const [locations, setLocations] = useState(null);
@@ -48,7 +49,7 @@ const Parent = () => {
                         <div>
                             <hr></hr>
                             {
-                                localStorage.getItem("username") ? <div>test</div> : <PlanningWelcome />
+                                localStorage.getItem("username") ? <LoginWelcomeAuthenticated /> : <PlanningWelcome />
                             }
                         </div>
                     }

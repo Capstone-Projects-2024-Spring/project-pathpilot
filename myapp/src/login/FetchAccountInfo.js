@@ -9,7 +9,8 @@ export const FetchAccountInfo = async (username, password) => {
             password
         });
         console.log(response);
-        localStorage.setItem("username",response.username);
+        localStorage.setItem("username",response.data.user);
+        console.log(localStorage.getItem("username"));
         return response.data;
     } catch (error) {
         console.error('Error fetching account information:', error.message);
