@@ -32,7 +32,7 @@ const UserInput = () => {
             </div>
             <div className='input-field'>
                 <div className='input-label'>Password</div>
-                <input onChange = {e => setPassword(e.target.value)} placeholder='Password' className='login-input'></input>
+                <input type='password' onChange = {e => setPassword(e.target.value)} placeholder='Password' className='login-input'></input>
             </div>
             <div className='login-submit-container'>
                 <button disabled={!submitButtonEnabled} onClick={sendAccountToBackend} className='login-submit'>Submit</button>
