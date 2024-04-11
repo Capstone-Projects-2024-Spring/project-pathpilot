@@ -30,7 +30,7 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
                         <div className="place-name">{place[1]}</div>
                         <div className="place-address">{place[5]}</div>
                         <br></br>
-                        <div className="place-cost">{place[10] !== '-1' ? <div>Cost:{place[10]}</div> : <div></div>}</div>
+                        <div className="place-cost">{place[10] !== "-1" ? <div>Cost:{place[10]}</div> : <div></div>}</div>
                         <div className="rating">
                             <Rating name="read-only" value={place[7]} precision={0.1} readOnly />
                             <div>({place[7]})</div>
@@ -39,7 +39,7 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
                                 {
                                     (JSON.parse(place[9])).map((attribute) => 
                                         <div>
-                                        {attribute === '-1' ? <div></div> :
+                                        {attribute === -1 ? <div></div> :
                                         <div className="individual-attribute-holder">
                                             <div className="individual-attribute">{attribute}</div>
                                         </div>
