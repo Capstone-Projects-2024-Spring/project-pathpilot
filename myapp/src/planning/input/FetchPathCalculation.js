@@ -6,6 +6,7 @@ const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neig
         const response = await axios.post(`${fetchPathURL}`, {
             locationTypes
         });
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error('Error fetching path calculation:', error.message);
