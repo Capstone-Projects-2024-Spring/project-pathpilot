@@ -105,11 +105,14 @@ const PlanManualInput = ({ updateLocations, updatePath, updateAdvancedOptions })
     const SendManualInputToBackend = async () => {
         try {
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
-            pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
-            pathData.path ? setPath(pathData.path) : console.log("ERROR");
+            //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
+            //pathData.path ? setPath(pathData.path) : console.log("ERROR");
+            console.log(JSON.parse(pathData.route[0][9]));
+            pathData ? setLocations(pathData.route) : console.log("ERROR");
+            pathData ? updateLocations(pathData.route) : console.log("ERROR");
 
-            pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
-            pathData.path ? updatePath(pathData.path) : console.log("ERROR");
+            //pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
+            //pathData.path ? updatePath(pathData.path) : console.log("ERROR");
         } catch {
             console.log("ERROR")
         }

@@ -25,6 +25,7 @@ const Parent = () => {
      * @param {List} newLocations - The new list of  locations
      */
     const updateLocations = (newLocations) => {
+        console.log("locations" + newLocations);
         setLocations(newLocations);
     }
     console.log(locations?.length);
