@@ -12,7 +12,6 @@ class PathController:
 
     def __init__(self):
         self.conn = sqlite3.connect('db.sqlite3')
-        print('database connection successful')
 
     def calculateReasonableRoute(self, location_types):
 
