@@ -32,8 +32,12 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
                         <br></br>
                         <div className="place-cost">{place[10] !== "-1" ? <div>Cost:{place[10]}</div> : <div></div>}</div>
                         <div className="rating">
+                            {place[7] !== -1 ?
+                            <div>
                             <Rating name="read-only" value={place[7]} precision={0.1} readOnly />
-                            <div>({place[7]})</div>
+                            <div>({place[7]})</div></div>
+                            : <div></div>
+                            }
                         </div>
                             <div className='attribute-holder'>
                                 {
