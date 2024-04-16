@@ -51,3 +51,16 @@
     }
 
 }
+
+.log-out {
+    padding-left: 1rem;
+}
+.log-out:hover {
+    color: white;
+    cursor: pointer;
+}
+
+.login-space {
+    height:0px;
+    padding-left: 1rem;
+}

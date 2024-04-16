@@ -11,7 +11,7 @@ class PathController:
     FEET_PER_DEGREE_LON = 288200
 
     def __init__(self):
-        self.conn = sqlite3.connect('../db.sqlite3')
+        self.conn = sqlite3.connect('db.sqlite3')
 
     def calculateReasonableRoute(self, location_types):
 

@@ -136,6 +136,16 @@ body {
     height: 100%;
 }
 
+.type-label {
+    padding-left: 1rem;
+    padding-top: 2px;
+    font-size: medium;
+}
+
+.place-intro-container {
+    display: flex;
+}
+
 .individual-attribute-holder {
     padding: 1rem;
 }
@@ -188,4 +198,8 @@ body {
     justify-content: center;
     color: #FFFFFF;
     height: 20px;
+  }
+
+  .we-want-bold {
+    font-weight: bold;
   }

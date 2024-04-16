@@ -31,7 +31,7 @@ const PlanMapOutput = ({ locations, path }) => {
                 setMarkersArray(markersArray => [...markersArray, new AdvancedMarkerElement({
                     map,
                     content: buildContent(place, count++), //<CustomMarker place={place} />,
-                    position: { lat: place.lat, lng: place.lng },
+                    position: { lat: place[3], lng: place[4] },
                 })])
             );
             /*if(markersArray.length > 0) {
@@ -40,7 +40,7 @@ const PlanMapOutput = ({ locations, path }) => {
             }*/
 
             locations?.map((place) => 
-            console.log(place.lat + "," + place.lng)
+            console.log(place[3] + "," + place[4])
             );
                 /*const latitude = 39.9526;
                 const longitude = -75.1652;

@@ -6,13 +6,20 @@ import { Link } from 'react-router-dom';
 const UserInput = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [badLogin, setBadLogin] = useState(false);
     const submitButtonEnabled = username.length > 0 && password.length > 0;
+
 
     const sendAccountToBackend = async () => {
         console.log("username: "+ username);
         console.log("password: "+ password);
         try{
             const accountResponse = await FetchAccountInfo(username, password);
+            if(accountResponse.message.includes("successful")) {
+                window.open('/planning');
+            } else {
+                setBadLogin(true);
+            }
             console.log(accountResponse);
         } catch {
             console.log("ERROR")
@@ -28,8 +35,11 @@ const UserInput = () => {
             </div>
             <div className='input-field'>
                 <div className='input-label'>Password</div>
-                <input onChange = {e => setPassword(e.target.value)} placeholder='Password' className='login-input'></input>
+                <input type='password' onChange = {e => setPassword(e.target.value)} placeholder='Password' className='login-input'></input>
             </div>
+            {
+                badLogin ? <div className='input-field error'>Incorrect username or password</div> : <div></div>
+            }
             <div className='login-submit-container'>
                 <button disabled={!submitButtonEnabled} onClick={sendAccountToBackend} className='login-submit'>Submit</button>
             </div>

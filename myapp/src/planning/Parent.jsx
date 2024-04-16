@@ -5,6 +5,7 @@ import PlanListOutput from './output/PlanListOutput';
 import PlanManualInput from './input/PlanManualInput';
 import PlanningWelcome from './PlanningWelcome';
 import './PathPlanning.css';
+import LoginWelcomeAuthenticated from './LoginWelcomAuthenticated';
 
 const Parent = () => {
     const [locations, setLocations] = useState(null);
@@ -24,6 +25,7 @@ const Parent = () => {
      * @param {List} newLocations - The new list of  locations
      */
     const updateLocations = (newLocations) => {
+        console.log("locations" + newLocations);
         setLocations(newLocations);
     }
     console.log(locations?.length);
@@ -47,7 +49,9 @@ const Parent = () => {
                     {includeAdvancedOptions ? <div></div> :
                         <div>
                             <hr></hr>
-                            <PlanningWelcome />
+                            {
+                                localStorage.getItem("username") ? <LoginWelcomeAuthenticated /> : <PlanningWelcome />
+                            }
                         </div>
                     }
                 </>
