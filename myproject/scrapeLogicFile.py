@@ -19,13 +19,13 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "museums"
+PLACETYPE = "parks"
 ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=parks"
     print(loType)
     return url
 
@@ -139,9 +139,11 @@ def parseInsideRequest(response): #returns all information, from business's own 
                         if(numTraits==1):
                             attributeArray.append(-1) #add it anyway
                         match attribute:
-                            case "Not Good For Kids":
+                            case "Not Good For Kids": #if this is on a park, it means that park is for dogs
                                 attributeArray.append(attribute)
                             case "Good For Kids":
+                                attributeArray.append(attribute)
+                            case "Dogs Allowed": #added for parks
                                 attributeArray.append(attribute)
                             case "Happy Hour Specials":
                                 attributeArray.append(attribute)
@@ -306,6 +308,10 @@ def addtoDatabase(infoDict):
             loTypeID = 4
         case "ice+cream":
             loTypeID = 5
+        case "playgrounds":
+            loTypeID = 6
+        case "parks":
+            loTypeID = 7
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
@@ -355,7 +361,7 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    while(numb<=3 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    while(numb<=9 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
         tempUrl= url + f"&start={val}"
