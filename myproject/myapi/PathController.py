@@ -165,7 +165,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "AIzaSyAvHe1avKUVS42St3pcE5W5YTgradz0z6A"
+                "X-Goog-Api-Key": "key-here"
             }
 
             response = requests.post(url, json=params, headers=header)
