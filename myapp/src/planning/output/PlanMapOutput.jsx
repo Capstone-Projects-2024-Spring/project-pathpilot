@@ -1,8 +1,10 @@
 import React, { useState,useEffect } from 'react';
+import FetchMap from './FetchMap.js';
 
-const PlanMapOutput = ({ locations, path }) => {
+const PlanMapOutput = ({ locations, poly }) => {
     const [map, setMap] = useState(null);
     const [markersArray, setMarkersArray] = useState([]);
+    const [polylineToDraw, setPolylineToDraw] = useState(null);
 
     useEffect(() => {
         async function initMap() {
@@ -21,6 +23,27 @@ const PlanMapOutput = ({ locations, path }) => {
         }
       initMap();
     }, []);
+
+    useEffect(() => {
+        async function drawPath() {
+            if(poly) {
+                console.log("poly in map");
+                console.log(poly.routes);
+                console.log(poly.routes[0]);
+                const google = window.google;
+                await google.maps.importLibrary("geometry");
+                const decodedPath = google.maps.geometry.encoding.decodePath(poly.routes[0].polyline.encodedPolyline);
+                setPolylineToDraw(new google.maps.Polyline({
+                    path: decodedPath,
+                    strokeColor: '#0804e8',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 4,
+                    map: map
+                }));
+            }
+        }
+        drawPath();
+    }, [poly]);
 
     useEffect(() => {
         async function placeMarkers() {
@@ -59,6 +82,9 @@ const PlanMapOutput = ({ locations, path }) => {
                 markersArray.map((marker) => 
                     marker.map = null
                 );
+            }
+            if(polylineToDraw) {
+                polylineToDraw.setMap(null);
             }
 
                 /*const latitude = 39.9526;

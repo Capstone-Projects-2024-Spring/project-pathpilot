@@ -66,7 +66,6 @@ body {
     background-color: #4681f4;
     text-decoration: none;
     font-size: larger;
-    cursor: pointer;
     border: none;
     height: 3rem;
     width: 20%;
@@ -74,6 +73,16 @@ body {
     border-radius: 4px;
     display: block;
     margin: auto;
+}
+
+.submit-button:hover:enabled {
+    background-color: #386acf;
+    cursor: pointer;
+}
+
+.submit-button:disabled {
+    background-color: #2e58ab;
+    color: rgb(202, 202, 202);
 }
 
 .bold-text {
@@ -184,7 +193,7 @@ body {
     height: 0;
     left: 50%;
     position: absolute;
-    top: 95%;
+    top: 92%;
     transform: translate(-50%, 0);
     transition: all 0.3s ease-out;
     width: 0;

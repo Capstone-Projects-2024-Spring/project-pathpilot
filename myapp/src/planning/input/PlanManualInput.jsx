@@ -7,7 +7,7 @@ import {TripAttributes} from './TripAttributes.js';
 import FetchPathCalculation from './FetchPathCalculation.js';
 import Select from 'react-select';
 
-const PlanManualInput = ({ updateLocations, updatePath, updateAdvancedOptions }) => {
+const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly }) => {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
     const [selectedAttributes, setSelectedAttributes] = useState([]);
     const [costChoice, setCostChoice] = useState(null);
@@ -110,6 +110,7 @@ const PlanManualInput = ({ updateLocations, updatePath, updateAdvancedOptions })
             console.log(JSON.parse(pathData.route[0][9]));
             pathData ? setLocations(pathData.route) : console.log("ERROR");
             pathData ? updateLocations(pathData.route) : console.log("ERROR");
+            pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
 
             //pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? updatePath(pathData.path) : console.log("ERROR");
@@ -191,7 +192,7 @@ const PlanManualInput = ({ updateLocations, updatePath, updateAdvancedOptions })
             }
             <br></br>
             <div className='submit-button-container'>
-                <button className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
+                <button disabled={selectedTypeLocations.length === 0} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
             </div>
         </div>
     )

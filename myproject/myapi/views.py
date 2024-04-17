@@ -57,9 +57,10 @@ def calculate_route(request):
 
         path_controller = PathController()
         route = path_controller.calculateReasonableRoute(location_types)
+        polyline = path_controller.calculatePolyline(route)
 
         if route:
-            return JsonResponse({'route': route})
+            return JsonResponse({'route': route, 'polyline': polyline})
         else:
             # Handle the case where no route could be calculated
             return JsonResponse({'error': 'Failed to calculate route'}, status=400)
