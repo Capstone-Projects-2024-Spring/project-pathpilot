@@ -1,5 +1,6 @@
 import random
 import sqlite3
+import requests
 
 class PathController:
 
@@ -119,6 +120,58 @@ class PathController:
 
     def favoriteRoute(route):
         pass
+
+    def calculatePolyline(self, route):
+        url = ' https://routes.googleapis.com/directions/v2:computeRoutes'
+
+        #location1 = {
+         #   "address": "1801 N Broad St, Philadelphia, PA 19122"
+        #}
+
+        if len(route) > 1:
+            locationsForRouting = []
+
+            for place in route:
+                locationsForRouting.append(
+                    {
+                        "location": {
+                            "latLng": {
+                                "latitude": place[3],
+                                "longitude": place[4]
+                            }
+                        }
+                    }
+                )
+            
+            params = None
+
+            if len(route) > 2:
+                params = {
+
+                    "origin": locationsForRouting[0],
+                    "intermediates": locationsForRouting[1:len(locationsForRouting)-1],
+                    "destination": locationsForRouting[len(locationsForRouting)-1],
+                    "travelMode": "WALK",
+
+                }
+            else:
+                params = {
+
+                    "origin": locationsForRouting[0],
+                    "destination": locationsForRouting[1],
+                    "travelMode": "WALK",
+
+                }                
+
+            header = {
+                "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
+                "X-Goog-Api-Key": "AIzaSyAvHe1avKUVS42St3pcE5W5YTgradz0z6A"
+            }
+
+            response = requests.post(url, json=params, headers=header)
+            return response.json()
+        else:
+            return None
 
 # Simple Algorithm Test
     

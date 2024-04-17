@@ -7,6 +7,7 @@ const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neig
             locationTypes
         });
         console.log(response.data);
+        console.log(response.data.polyline);
         return response.data;
     } catch (error) {
         console.error('Error fetching path calculation:', error.message);

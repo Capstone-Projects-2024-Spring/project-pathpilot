@@ -9,16 +9,8 @@ import LoginWelcomeAuthenticated from './LoginWelcomAuthenticated';
 
 const Parent = () => {
     const [locations, setLocations] = useState(null);
-    const [path, setPath] = useState(null);
     const [includeAdvancedOptions, setIncludeAdvancedOptions] = useState(false);
-
-    /**
-     * Updates the path
-     * @param {String} newPath - The new path code
-     */
-    const updatePath = (newPath) => {
-        setPath(newPath);
-    }
+    const [poly, setPoly] = useState(null);
 
     /**
      * Updates the locations
@@ -35,17 +27,23 @@ const Parent = () => {
         console.log("test");
     }
 
+    const updatePoly = (polyline) => {
+        setPoly(polyline);
+        console.log("polyline in parent");
+        console.log(polyline);
+    }
+
     return (
         <div className='main-component'>
             <div className='output'>
-                <PlanMapOutput locations={locations} path={path}/>
+                <PlanMapOutput locations={locations} poly={poly}/>
             </div>
             <div className='input'>
             {
                 locations ? <div>
                                 <PlanListOutput locations={locations} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} />
                             </div> :
-                <><PlanManualInput updateLocations={updateLocations} updatePath={updatePath} updateAdvancedOptions={updateAdvancedOptions}/>
+                <><PlanManualInput updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} updatePoly={updatePoly}/>
                     {includeAdvancedOptions ? <div></div> :
                         <div>
                             <hr></hr>
