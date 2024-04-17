@@ -1,1 +1,66 @@
 /* Establishes the UI styling for Footer.jsx*/
+
+.nav-bar ul{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background-color: #0000ee89;
+    top: 0;
+    width: 100%;
+    position:fixed;
+    z-index: 1;
+    display:flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.nav-bar ul li{
+    font-size: 1rem;
+    &:hover{
+        background-color:#6ba6b4
+    }
+}
+
+.nav-bar ul li a{
+    display:block;
+    color:white;
+    text-align: center;
+    padding: 15px 20px;
+    text-decoration: none;
+}
+
+.nav-bar .header{
+
+    &:hover{
+        background-color: #3a4937;
+    }
+}
+
+.nav-bar img{
+    width: 50px;
+    height: auto;
+}
+
+.nav-bar .logo{
+    flex-grow: 2;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    &:hover{
+        background-color: #3a4937;
+    }
+
+}
+
+.log-out {
+    padding-left: 1rem;
+}
+.log-out:hover {
+    color: white;
+    cursor: pointer;
+}
+
+.login-space {
+    height:0px;
+    padding-left: 1rem;
+}

@@ -1,28 +1,23 @@
 import React from 'react';
 import {useState} from 'react';
-import PlanOutput from './output/PlanOutput'; 
+import PlanMapOutput from './output/PlanMapOutput'; 
+import PlanListOutput from './output/PlanListOutput';
 import PlanManualInput from './input/PlanManualInput';
 import PlanningWelcome from './PlanningWelcome';
 import './PathPlanning.css';
+import LoginWelcomeAuthenticated from './LoginWelcomAuthenticated';
 
 const Parent = () => {
     const [locations, setLocations] = useState(null);
-    const [path, setPath] = useState(null);
     const [includeAdvancedOptions, setIncludeAdvancedOptions] = useState(false);
-
-    /**
-     * Updates the path
-     * @param {String} newPath - The new path code
-     */
-    const updatePath = (newPath) => {
-        setPath(newPath);
-    }
+    const [poly, setPoly] = useState(null);
 
     /**
      * Updates the locations
      * @param {List} newLocations - The new list of  locations
      */
     const updateLocations = (newLocations) => {
+        console.log("locations" + newLocations);
         setLocations(newLocations);
     }
     console.log(locations?.length);
@@ -32,20 +27,33 @@ const Parent = () => {
         console.log("test");
     }
 
+    const updatePoly = (polyline) => {
+        setPoly(polyline);
+        console.log("polyline in parent");
+        console.log(polyline);
+    }
+
     return (
         <div className='main-component'>
             <div className='output'>
-                <PlanOutput locations={locations} path={path}/>
+                <PlanMapOutput locations={locations} poly={poly}/>
             </div>
             <div className='input'>
-                <PlanManualInput updateLocations={updateLocations} updatePath={updatePath} updateAdvancedOptions={updateAdvancedOptions}/>
-                {
-                    includeAdvancedOptions ? <div></div> :
+            {
+                locations ? <div>
+                                <PlanListOutput locations={locations} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} />
+                            </div> :
+                <><PlanManualInput updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} updatePoly={updatePoly}/>
+                    {includeAdvancedOptions ? <div></div> :
                         <div>
                             <hr></hr>
-                            <PlanningWelcome />
+                            {
+                                localStorage.getItem("username") ? <LoginWelcomeAuthenticated /> : <PlanningWelcome />
+                            }
                         </div>
-                }
+                    }
+                </>
+            }
             </div>
         </div>
     )
