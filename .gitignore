@@ -1,3 +1,6 @@
+*.html
+index.html
+
 # Generated files
 .docusaurus
 
@@ -15,6 +18,5 @@ db.sqlite3
 
 *.pyc
 
-*.html
 local_settings.py
 
