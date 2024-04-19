@@ -7,7 +7,7 @@ import {TripAttributes} from './TripAttributes.js';
 import FetchPathCalculation from './FetchPathCalculation.js';
 import Select from 'react-select';
 
-const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly }) => {
+const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, updateAttributeList }) => {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
     const [selectedAttributes, setSelectedAttributes] = useState([]);
     const [costChoice, setCostChoice] = useState(null);
@@ -93,6 +93,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
     }
 
     const handleAdvanceOptions = () => {
+        console.log("Attributes");
+        console.log(selectedAttributes);
         if(advancedOptions) {
             setAdvancedOptions(false);
             updateAdvancedOptions(false);
@@ -104,6 +106,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
 
     const SendManualInputToBackend = async () => {
         try {
+            console.log("Attributes");
+            console.log(selectedAttributes);
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
@@ -111,6 +115,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             pathData ? setLocations(pathData.route) : console.log("ERROR");
             pathData ? updateLocations(pathData.route) : console.log("ERROR");
             pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
+            pathData ? updateAttributeList(selectedAttributes) : console.log("ERROR");
 
             //pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? updatePath(pathData.path) : console.log("ERROR");
@@ -144,18 +149,14 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
                         <br></br>
                         <div className='advanced-options-title' onClick={handleAdvanceOptions}>Minimize Advanced Options</div>
                         <h3>Type of trip</h3>
-                        <FormGroup>
-                        {
-                            TripAttributes?.map((attribute) =>
-                            <div>
-                                <FormControlLabel control={<Checkbox value={attribute.value} onChange={handleAttributeChange}/>} label={attribute.label} />
-                                {
-                                    console.log("Value " + attribute.value)
-                                }
-                            </div>
-                            )
-                        }
-                        </FormGroup>
+                        <Select
+                            isMulti
+                            name="colors"
+                            options={TripAttributes}
+                            onChange={choice => setSelectedAttributes(choice)}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                        />
                         <h3>Cost of Locations</h3>
                         <Select
                             className='input-option-select'
