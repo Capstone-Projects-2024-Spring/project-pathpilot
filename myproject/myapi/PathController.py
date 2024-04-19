@@ -73,7 +73,7 @@ class PathController:
         if last_location is None:
 
             # Fetch all locations of specified location type
-            cursor.execute(f"SELECT id FROM myapi_location WHERE location_type_id = {location_type}")
+            cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
@@ -85,8 +85,32 @@ class PathController:
             
             # Return a random unattempted starting location's ID
             else:
-                random_location = random.choice(unattempted_starting_locations)
-                return random_location[0]
+                if len(attributes) > 0:
+                    unattempted_starting_locations_with_attributes = []
+                    for loc in unattempted_starting_locations:
+                        attributeList = json.loads(loc[1])
+                        numAttributes = 0
+                        for attribute in attributes:
+                            if attribute in attributeList:
+                                numAttributes = numAttributes + 1
+                        unattempted_starting_locations_with_attributes.append({
+                            "location": loc,
+                            "numAttributes": numAttributes
+                        })
+            
+                    sort_unnattempted_list = sorted(unattempted_starting_locations_with_attributes, key=itemgetter('numAttributes'), reverse=True)
+
+                    maxCount = sort_unnattempted_list [0]["numAttributes"]
+                    counter = 0
+                    while counter < len(sort_unnattempted_list) and sort_unnattempted_list [counter]["numAttributes"] == maxCount:
+                        counter = counter + 1
+                    counter = counter - 1
+                    random_location_id = random.randint(0,counter)
+                    random_location = sort_unnattempted_list[random_location_id]
+                    return random_location["location"][0]
+                else:
+                    random_location = random.choice(unattempted_starting_locations)
+                    return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
         else:
