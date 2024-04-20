@@ -67,8 +67,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     ]
 
-# CORS_ORIGIN_ALLOW_ALL = True
-
 ROOT_URLCONF = 'myproject.urls'
 
 TEMPLATES = [

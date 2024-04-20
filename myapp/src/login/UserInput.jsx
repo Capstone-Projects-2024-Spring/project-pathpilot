@@ -16,7 +16,7 @@ const UserInput = () => {
         try{
             const accountResponse = await FetchAccountInfo(username, password);
             if(accountResponse.message.includes("successful")) {
-                window.open('/planning');
+                window.location.href = '/planning';
             } else {
                 setBadLogin(true);
             }

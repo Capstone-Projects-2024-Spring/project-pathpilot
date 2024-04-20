@@ -56,6 +56,7 @@ class PathController:
             location_data = self.fetch_location_data(location_id)
             reasonable_route.append(location_data)
 
+        print("reasonable route yo: ", reasonable_route)
         return reasonable_route
     
     # This function returns a random LocationID from the Locations table that has the associated LocationType
@@ -165,7 +166,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "key-here"
+                "X-Goog-Api-Key": "AIzaSyBXBAxaiXldHMWmmqgOHQ3RDeLUb1MIh2U"
             }
 
             response = requests.post(url, json=params, headers=header)

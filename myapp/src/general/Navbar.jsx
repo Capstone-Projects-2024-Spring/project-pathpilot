@@ -30,6 +30,7 @@ const NavbarBoot = () => {
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
             <Nav.Link as={Link} to="/planning">Planning</Nav.Link>
+            <Nav.Link as={Link} to="/savedroutes">Saved Routes</Nav.Link>
             </Nav>
             <Nav className="ml-auto">
             {

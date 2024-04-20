@@ -118,9 +118,9 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             console.log("ERROR")
         }
     }
-    console.log(locations);
-    console.log(path);
-    
+    console.log("locations = ", locations);
+    console.log("path = ", path);
+
     
     return (
         <div className='input-padding'>

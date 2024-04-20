@@ -4,8 +4,10 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from myapi.PathController import PathController
+from myapi.SavedRoutesController import SavedRoutesController
 from myapi.models import Account
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -23,7 +25,7 @@ def user_login_attempt(request):
 
         if user is not None:
             login(request, user)
-            return JsonResponse({'message': 'Login successful', 'user': username})
+            return JsonResponse({'message': 'Login successful', 'user': username, 'id': user.id})
         else:
             return JsonResponse({'message': 'error: Invalid username or password'})
     else:
@@ -49,7 +51,7 @@ def user_create_account(request):
         return JsonResponse({'message': 'User account created successfully'})
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
-    
+
 @api_view(['POST'])
 def calculate_route(request):
     if request.method == 'POST':
@@ -60,6 +62,7 @@ def calculate_route(request):
         polyline = path_controller.calculatePolyline(route)
 
         if route:
+            # here is where it should add?
             return JsonResponse({'route': route, 'polyline': polyline})
         else:
             # Handle the case where no route could be calculated
@@ -67,6 +70,37 @@ def calculate_route(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+@csrf_exempt
+@api_view(['GET'])
+def get_saved_routes(request):
+    if request.method == 'GET':
+        print("current_user = ", request.user)
+        return JsonResponse({'user': request.user.username})
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+ 
+@api_view(['POST'])
+def add_saved_route(request):
+    if request.method == 'POST':
+        user_id = request.data.get("user_id")
+        locations = request.data.get("locations")
+        saved_routes_controller = SavedRoutesController()
+        saved_routes_controller.addSavedRoute(user_id, locations)
+        return JsonResponse({'message': 'we out here'})
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@api_view(['GET'])
+def get_username(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            username = request.session.get('username')
+            return JsonResponse({'username': username})
+        else:
+            return JsonResponse({'error': 'User is not authenticated'}, status=401)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
 def check_credentials(username, password):
     try:
         # Retrieve the account based on the provided username
