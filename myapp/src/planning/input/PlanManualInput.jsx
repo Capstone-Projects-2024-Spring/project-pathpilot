@@ -21,6 +21,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     //Get rid of these eventually
     const [path, setPath] = useState(null);
     const [locations, setLocations] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     //For select options
     const cost = [
@@ -108,9 +109,11 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         try {
             console.log("Attributes");
             console.log(selectedAttributes);
+            setLoading(true);
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
+            setLoading(false);
             console.log(JSON.parse(pathData.route[0][9]));
             pathData ? setLocations(pathData.route) : console.log("ERROR");
             pathData ? updateLocations(pathData.route) : console.log("ERROR");
@@ -193,7 +196,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             }
             <br></br>
             <div className='submit-button-container'>
-                <button disabled={selectedTypeLocations.length === 0} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
+                <button disabled={loading || selectedTypeLocations.length === 0} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
             </div>
         </div>
     )

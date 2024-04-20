@@ -17,12 +17,27 @@ class PathController:
         self.conn = sqlite3.connect('db.sqlite3')
 
     def calculateReasonableRoute(self, location_types, attributes):
+        print('first')
+        print(location_types)
+        int_location_types = [eval(i) for i in location_types]
+        print(int_location_types)
 
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
         search_radius = PathController.INITIAL_SEARCH_RADIUS
         last_location = None
+
+        cursor = self.conn.cursor()
+        cursor.execute(f"SELECT location_type_id, COUNT(*) FROM myapi_location GROUP BY location_type_id")
+        location_type_count = cursor.fetchall()
+        sorted_location_type = sorted(location_type_count, key=itemgetter(1))
+        filtered_location_types = list(filter(lambda x: x[0] in int_location_types, sorted_location_type))
+        location_types=[]
+        for loc in filtered_location_types:
+            location_types.append(loc[0])
+        print('here')
+        print(location_types)
 
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
@@ -226,7 +241,7 @@ class PathController:
 
 # Simple Algorithm Test
     
-location_types=[1,2]
+location_types=['1','2']
 attributes=[]
 
 path_controller = PathController()
