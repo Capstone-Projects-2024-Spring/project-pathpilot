@@ -19,13 +19,13 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "coffee+shops"
-ZIPCODEINPUT = 19147
+PLACETYPE = "bakeries"
+ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=coffee"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=bakeries"
     print(loType)
     return url
 
@@ -156,6 +156,12 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             case "Dairy-Free Options": #added for ice cream shops
                                 attributeArray.append(attribute)
                             case "Free Wi-Fi": #added for coffee shops
+                                attributeArray.append(attribute)
+                            case "Gluten-Free Options": #added for bakeries, wasn't used for restaurants
+                                attributeArray.append(attribute)
+                            case "Offers Takeout": #bakeries
+                                attributeArray.append(attribute)
+                            case "Vegan Options": #bakeries
                                 attributeArray.append(attribute)
                             case "Quiet" | "Loud" | "Moderate Noise": #added for coffee shops
                                 attributeArray.append(attribute)
@@ -312,6 +318,10 @@ def addtoDatabase(infoDict):
             loTypeID = 6
         case "parks":
             loTypeID = 7
+        case "vintage+shops":
+            loTypeID = 8
+        case "bakeries":
+            loTypeID = 9
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
@@ -361,7 +371,7 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    while(numb<=12 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
         tempUrl= url + f"&start={val}"
