@@ -6,6 +6,7 @@ import {LocationTypes} from './LocationTypes.js';
 import {TripAttributes} from './TripAttributes.js';
 import FetchPathCalculation from './FetchPathCalculation.js';
 import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, updateAttributeList }) => {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
@@ -16,6 +17,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [locatedNear, setLocatedNear] = useState(null);
 
     const [advancedOptions, setAdvancedOptions] = useState(false);
+
+    const animatedComponents = makeAnimated();
 
 
     //Get rid of these eventually
@@ -156,38 +159,47 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                             isMulti
                             name="colors"
                             options={TripAttributes}
+                            components={animatedComponents}
                             onChange={choice => setSelectedAttributes(choice)}
                             className="basic-multi-select"
                             classNamePrefix="select"
                         />
                         <h3>Cost of Locations</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setCostChoice(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            onChange={choice => choice === null ? setCostChoice(null) : setCostChoice(choice.value)}
                             options={cost}
+                            isClearable={true}
                             placeholder="Select Cost..."
                         />
             
                         <h3>Minimum Number of Stars</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setStarsChoice(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            onChange={choice => choice === null ? setStarsChoice(null) : setStarsChoice(choice.value)}
                             options={stars}
+                            isClearable={true}
                             placeholder="Select Stars..."
                         />
             
                         <h3>Preferred Neighborhood</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setNeighborhoodChoice(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            onChange={choice => choice === null ? setNeighborhoodChoice(null) : setNeighborhoodChoice(choice.value)}
                             options={neighborhoods}
+                            isClearable={true}
                             placeholder="Select Neighborhood..."
                         />
             
                         <h3>Located Near A</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setLocatedNear(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            isClearable={true}
+                            onChange={choice => choice === null ? setLocatedNear(null) : setLocatedNear(choice.value)}
                             options={locatedNearLocations}
                             placeholder="Select Locations..."
                         />

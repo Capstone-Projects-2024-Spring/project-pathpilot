@@ -7,8 +7,8 @@ from operator import itemgetter
 class PathController:
 
     # Measured In Feet
-    INITIAL_SEARCH_RADIUS = 2000
-    SEARCH_RADIUS_LIMIT = 10000
+    INITIAL_SEARCH_RADIUS = 3000
+    SEARCH_RADIUS_LIMIT = 5000
 
     FEET_PER_DEGREE_LAT = 364000
     FEET_PER_DEGREE_LON = 288200
@@ -17,27 +17,11 @@ class PathController:
         self.conn = sqlite3.connect('db.sqlite3')
 
     def calculateReasonableRoute(self, location_types, attributes):
-        print('first')
-        print(location_types)
-        int_location_types = [eval(i) for i in location_types]
-        print(int_location_types)
-
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
         search_radius = PathController.INITIAL_SEARCH_RADIUS
         last_location = None
-
-        cursor = self.conn.cursor()
-        cursor.execute(f"SELECT location_type_id, COUNT(*) FROM myapi_location GROUP BY location_type_id")
-        location_type_count = cursor.fetchall()
-        sorted_location_type = sorted(location_type_count, key=itemgetter(1))
-        filtered_location_types = list(filter(lambda x: x[0] in int_location_types, sorted_location_type))
-        location_types=[]
-        for loc in filtered_location_types:
-            location_types.append(loc[0])
-        print('here')
-        print(location_types)
 
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
@@ -60,7 +44,7 @@ class PathController:
 
                 # If there are no more valid starting locations, broaden the search radius and retry all attempted starting locations
                 else:
-                    search_radius += 500
+                    search_radius += 1000
                     attempted_starting_locations.clear()
 
                     # If search radius exceeds limit, return None
