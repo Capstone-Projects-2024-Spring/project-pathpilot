@@ -19,13 +19,13 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "bakeries"
-ZIPCODEINPUT = 19148
+PLACETYPE = "five+iron"
+ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=bakeries"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
     return url
 
@@ -322,6 +322,8 @@ def addtoDatabase(infoDict):
             loTypeID = 8
         case "bakeries":
             loTypeID = 9
+        case "mini+golf" | "bowling" | "barcade" | "ping+pong" | "axe+throwing" | "candle+making" | "rock+climbing" | "zoo" | "five+iron":
+            loTypeID = 10
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
@@ -371,6 +373,7 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
+    numb=15
     while(numb<=12 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
