@@ -20,7 +20,7 @@ from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
 PLACETYPE = "bakeries"
-ZIPCODEINPUT = 19122
+ZIPCODEINPUT = 19148
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
