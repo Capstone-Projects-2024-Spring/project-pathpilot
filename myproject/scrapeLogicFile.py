@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "five+iron"
+PLACETYPE = "parking+garage"
 ZIPCODEINPUT = 19122
 insideURLArray = []
 finalRestaurantList = [None] * 10
@@ -180,7 +180,10 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             #case attribute if "Estimated Health Score" in attribute:
                             #    attributeArray.append("Trendy")
                             case "Accepts Credit Cards":
-                                attributeArray.append(attribute)
+                                if(trait.find(class_="css-qyp8bo")!=None): #if it has the class differentiator for the x (not check)
+                                    attributeArray.append("Does Not Accept credit Cards")
+                                else: #if it doesn't have that class
+                                    attributeArray.append(attribute)
                 
     
                             
@@ -324,6 +327,8 @@ def addtoDatabase(infoDict):
             loTypeID = 9
         case "mini+golf" | "bowling" | "barcade" | "ping+pong" | "axe+throwing" | "candle+making" | "rock+climbing" | "zoo" | "five+iron":
             loTypeID = 10
+        case "parking+garage" | "parking+lot":
+            loTypeID = 11
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     conn = sqlite3.connect('myproject/db.sqlite3')
@@ -373,7 +378,7 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    numb=15
+    numb=20
     while(numb<=12 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
