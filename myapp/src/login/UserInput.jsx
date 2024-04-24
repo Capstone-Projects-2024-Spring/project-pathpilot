@@ -13,6 +13,7 @@ const UserInput = () => {
     const sendAccountToBackend = async () => {
         console.log("username: "+ username);
         console.log("password: "+ password);
+        console.log("send account to backend");
         try{
             const accountResponse = await FetchAccountInfo(username, password);
             if(accountResponse.message.includes("successful")) {

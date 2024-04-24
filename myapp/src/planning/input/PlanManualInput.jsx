@@ -129,7 +129,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             {
                 LocationTypes?.map((type) =>
                 <div>
-                    <FormControlLabel control={<Checkbox value={type.value} onChange={handleTypeChange}/>} label={type.label} />
+                    <FormControlLabel data-testid='type-check' control={<Checkbox value={type.value} onChange={handleTypeChange}/>} label={type.label} />
                     {
                         console.log("Value " + selectedTypeLocations)
                     }
@@ -157,20 +157,24 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
                         }
                         </FormGroup>
                         <h3>Cost of Locations</h3>
-                        <Select
-                            className='input-option-select'
-                            onChange={choice => setCostChoice(choice.value)}
-                            options={cost}
-                            placeholder="Select Cost..."
-                        />
+                        <div data-testid="cost-select">
+                            <Select
+                                className='input-option-select'
+                                onChange={choice => setCostChoice(choice.value)}
+                                options={cost}
+                                placeholder="Select Cost..."
+                            />
+                        </div>
             
                         <h3>Minimum Number of Stars</h3>
-                        <Select
-                            className='input-option-select'
-                            onChange={choice => setStarsChoice(choice.value)}
-                            options={stars}
-                            placeholder="Select Stars..."
-                        />
+                        <div data-testid="stars-select">
+                            <Select
+                                className='input-option-select'
+                                onChange={choice => setStarsChoice(choice.value)}
+                                options={stars}
+                                placeholder="Select Stars..."
+                            />
+                        </div>
             
                         <h3>Preferred Neighborhood</h3>
                         <Select
