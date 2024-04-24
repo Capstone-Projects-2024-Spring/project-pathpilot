@@ -19,7 +19,7 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "restaurants"
+PLACETYPE = "coffee+shops"
 ZIPCODEINPUT = 19146
 insideURLArray = []
 finalRestaurantList = [None] * 10
@@ -301,6 +301,10 @@ def addtoDatabase(infoDict):
             address = infoDict["address"][0]  + " " + infoDict["address"][1] + " " + infoDict["address"][2] + " " + infoDict["address"][3]
             latitude = infoDict["address"][4]
             longitude = infoDict["address"][5]
+    elif(len(infoDict["address"])==1 and infoDict["address"][0] != -1): # JUST AN ADDRESS
+        address = infoDict["address"][0]
+        latitude = -1
+        longitude =-1
     else:
         address=-1
         latitude = infoDict["address"][0]
@@ -389,7 +393,7 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    numb=31
+    #numb=31
     while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
