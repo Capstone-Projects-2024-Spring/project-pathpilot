@@ -17,9 +17,7 @@ class SavedRoutesController:
                     cursor.execute("SELECT * FROM myapi_location WHERE id = ?", (location_id,))
                     location_info = cursor.fetchall()
                     route_info.append(location_info)
-                    #print("dat location info, ", location_info)
                 routes_info.append(route_info)
-                #print("dat routes info", routes_info)
             cursor.close()
 
             locations_data = []
@@ -28,7 +26,7 @@ class SavedRoutesController:
                 for index, location_info in enumerate(locations_list,start=1):
                     location_data.append([location_info[0][1], location_info[0][5]])
                 locations_data.append(location_data)
-                
+
             return locations_data
 
 
@@ -76,8 +74,6 @@ class SavedRoutesController:
         cursor = self.conn.cursor()
 
         location_ids = [item[0] for item in locations]
-        print("that user id = ", user_id)
-        print("that locations = ", location_ids)
 
         try:
             # Insert a new route record into the Saved_Routes table
