@@ -11,6 +11,7 @@ const Parent = () => {
     const [locations, setLocations] = useState(null);
     const [includeAdvancedOptions, setIncludeAdvancedOptions] = useState(false);
     const [poly, setPoly] = useState(null);
+    const [attributeList, setAttributeList] = useState([]);
 
     /**
      * Updates the locations
@@ -33,6 +34,14 @@ const Parent = () => {
         console.log(polyline);
     }
 
+    const updateAttributeList = (attributes) => {
+        console.log("attributes in parent");
+        console.log(attributes);
+        const attributesToSend = attributes.map(attribute => attribute.value)
+        console.log(attributesToSend);
+        setAttributeList(attributesToSend);
+    }
+
     return (
         <div className='main-component'>
             <div className='output'>
@@ -41,9 +50,9 @@ const Parent = () => {
             <div className='input'>
             {
                 locations ? <div>
-                                <PlanListOutput locations={locations} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} />
+                                <PlanListOutput locations={locations} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} attributeList={attributeList} updateAttributeList={updateAttributeList} />
                             </div> :
-                <><PlanManualInput updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} updatePoly={updatePoly}/>
+                <><PlanManualInput updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} updatePoly={updatePoly} updateAttributeList={updateAttributeList}/>
                     {includeAdvancedOptions ? <div></div> :
                         <div>
                             <hr></hr>

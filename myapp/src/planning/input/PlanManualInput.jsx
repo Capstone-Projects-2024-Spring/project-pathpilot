@@ -6,8 +6,9 @@ import {LocationTypes} from './LocationTypes.js';
 import {TripAttributes} from './TripAttributes.js';
 import FetchPathCalculation from './FetchPathCalculation.js';
 import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
-const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly }) => {
+const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, updateAttributeList }) => {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
     const [selectedAttributes, setSelectedAttributes] = useState([]);
     const [costChoice, setCostChoice] = useState(null);
@@ -17,10 +18,13 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
 
     const [advancedOptions, setAdvancedOptions] = useState(false);
 
+    const animatedComponents = makeAnimated();
+
 
     //Get rid of these eventually
     const [path, setPath] = useState(null);
     const [locations, setLocations] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     //For select options
     const cost = [
@@ -93,6 +97,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
     }
 
     const handleAdvanceOptions = () => {
+        console.log("Attributes");
+        console.log(selectedAttributes);
         if(advancedOptions) {
             setAdvancedOptions(false);
             updateAdvancedOptions(false);
@@ -104,13 +110,18 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
 
     const SendManualInputToBackend = async () => {
         try {
+            console.log("Attributes");
+            console.log(selectedAttributes);
+            setLoading(true);
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
+            setLoading(false);
             console.log(JSON.parse(pathData.route[0][9]));
             pathData ? setLocations(pathData.route) : console.log("ERROR");
             pathData ? updateLocations(pathData.route) : console.log("ERROR");
             pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
+            pathData ? updateAttributeList(selectedAttributes) : console.log("ERROR");
 
             //pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? updatePath(pathData.path) : console.log("ERROR");
@@ -144,46 +155,51 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
                         <br></br>
                         <div className='advanced-options-title' onClick={handleAdvanceOptions}>Minimize Advanced Options</div>
                         <h3>Type of trip</h3>
-                        <FormGroup>
-                        {
-                            TripAttributes?.map((attribute) =>
-                            <div>
-                                <FormControlLabel control={<Checkbox value={attribute.value} onChange={handleAttributeChange}/>} label={attribute.label} />
-                                {
-                                    console.log("Value " + attribute.value)
-                                }
-                            </div>
-                            )
-                        }
-                        </FormGroup>
+                        <Select
+                            isMulti
+                            name="colors"
+                            options={TripAttributes}
+                            components={animatedComponents}
+                            onChange={choice => setSelectedAttributes(choice)}
+                            className="basic-multi-select"
+                            classNamePrefix="select"
+                        />
                         <h3>Cost of Locations</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setCostChoice(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            onChange={choice => choice === null ? setCostChoice(null) : setCostChoice(choice.value)}
                             options={cost}
+                            isClearable={true}
                             placeholder="Select Cost..."
                         />
             
                         <h3>Minimum Number of Stars</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setStarsChoice(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            onChange={choice => choice === null ? setStarsChoice(null) : setStarsChoice(choice.value)}
                             options={stars}
+                            isClearable={true}
                             placeholder="Select Stars..."
                         />
             
                         <h3>Preferred Neighborhood</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setNeighborhoodChoice(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            onChange={choice => choice === null ? setNeighborhoodChoice(null) : setNeighborhoodChoice(choice.value)}
                             options={neighborhoods}
+                            isClearable={true}
                             placeholder="Select Neighborhood..."
                         />
             
                         <h3>Located Near A</h3>
                         <Select
-                            className='input-option-select'
-                            onChange={choice => setLocatedNear(choice.value)}
+                            className="basic-single"
+                            classNamePrefix="select"
+                            isClearable={true}
+                            onChange={choice => choice === null ? setLocatedNear(null) : setLocatedNear(choice.value)}
                             options={locatedNearLocations}
                             placeholder="Select Locations..."
                         />
@@ -192,7 +208,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             }
             <br></br>
             <div className='submit-button-container'>
-                <button disabled={selectedTypeLocations.length === 0} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
+                <button disabled={loading || selectedTypeLocations.length === 0} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
             </div>
         </div>
     )

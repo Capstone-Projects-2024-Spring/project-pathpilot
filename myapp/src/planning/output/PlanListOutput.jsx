@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Rating } from '@mui/material';
 import {LocationTypes} from '../input/LocationTypes.js';
 
-const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) => {
+const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions, attributeList, updateAttributeList }) => {
     const locationsList = [
         "place1","place2","place3"
     ];
@@ -12,6 +12,7 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
     const ReturnToInput = () => {
         updateLocations(null);
         updateAdvancedOptions(false);
+        updateAttributeList([]);
     }
 
     return (
@@ -53,7 +54,11 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
                                         <div>
                                         {attribute === -1 ? <div></div> :
                                         <div className="individual-attribute-holder">
-                                            <div className="individual-attribute">{attribute}</div>
+                                            {
+                                                attributeList.includes(attribute) ? 
+                                                <div className="individual-attribute-selected">{attribute}</div> : 
+                                                <div className="individual-attribute">{attribute}</div>
+                                            }
                                         </div>
                                         }
                                         </div>
