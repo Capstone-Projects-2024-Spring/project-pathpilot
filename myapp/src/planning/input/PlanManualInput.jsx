@@ -78,7 +78,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
         } else {
             const index = selectedTypeLocations.indexOf(e.target.value);
             selectedTypeLocations.splice(index,1);
-            console.log(selectedTypeLocations);
+            //console.log(selectedTypeLocations);
         }
     }
 
@@ -88,7 +88,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
         } else {
             const index = selectedAttributes.indexOf(e.target.value);
             selectedAttributes.splice(index,1);
-            console.log(selectedAttributes);
+            //console.log(selectedAttributes);
         }
     }
 
@@ -107,7 +107,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
-            console.log(JSON.parse(pathData.route[0][9]));
+            //console.log(JSON.parse(pathData.route[0][9]));
             pathData ? setLocations(pathData.route) : console.log("ERROR");
             pathData ? updateLocations(pathData.route) : console.log("ERROR");
             pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
@@ -118,8 +118,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             console.log("ERROR")
         }
     }
-    console.log("locations = ", locations);
-    console.log("path = ", path);
+    //console.log("locations = ", locations);
+    //console.log("path = ", path);
 
     
     return (
@@ -131,7 +131,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
                 <div>
                     <FormControlLabel control={<Checkbox value={type.value} onChange={handleTypeChange}/>} label={type.label} />
                     {
-                        console.log("Value " + selectedTypeLocations)
+                        //console.log("Value " + selectedTypeLocations)
                     }
                 </div>
                 )
@@ -150,7 +150,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
                             <div>
                                 <FormControlLabel control={<Checkbox value={attribute.value} onChange={handleAttributeChange}/>} label={attribute.label} />
                                 {
-                                    console.log("Value " + attribute.value)
+                                    //console.log("Value " + attribute.value)
                                 }
                             </div>
                             )

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FetchSavedRoutes } from './FetchSavedRoutes.js';
+import { FetchSavedRoutes } from './FetchSavedRoutes';
+import LocationGroups from './LocationGroups';
 
 const SavedRoutesCards = () => {
     const [savedRoutes, setSavedRoutes] = useState([]);
@@ -9,7 +10,7 @@ const SavedRoutesCards = () => {
     useEffect(() => {
         const fetchRoutes = async () => {
             try {
-                const routes = await FetchSavedRoutes();
+                const { routes } = await FetchSavedRoutes();
                 setSavedRoutes(routes);
                 setLoading(false);
             } catch (error) {
@@ -31,17 +32,22 @@ const SavedRoutesCards = () => {
 
     return (
         <div>
-            {Array.isArray(savedRoutes) && savedRoutes.length > 0 ? (
-                savedRoutes.map(route => (
-                    <div key={route.id}>
-                        {/* Render each saved route */}
-                    </div>
-                ))
+            {localStorage.getItem("id") === null ? (
+                <p>You must create an account to save and view your saved routes.</p>
             ) : (
-                <p>No saved routes found.</p>
+                 <>
+                    {Array.isArray(savedRoutes) && savedRoutes.length > 0 ? (
+                        <LocationGroups data={savedRoutes} />
+                    ) : (
+                        <p>No saved routes found.</p>
+                    )}
+                </>
             )}
         </div>
     );
 };
 
 export default SavedRoutesCards;
+
+
+

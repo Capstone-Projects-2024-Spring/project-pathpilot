@@ -28,12 +28,15 @@ const SaveRouteToAccount = async () => {
     
     return (
         <div>
-            <div className='start-again-button-container'>
-                <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
+            <div className='start-again-and-save-route-button-container'>
+                <div className='start-again-button-container'>
+                    <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
+                </div>
+                <div className='start-again-button-container'>
+                    <button className='submit-button' onClick={SaveRouteToAccount}>Save Route</button>
+                </div>
             </div>
-            <div className='start-again-button-container'>
-                <button className='submit-button' onClick={SaveRouteToAccount}>Save Route</button>
-            </div>
+            
             {
             locations ? 
             locations.map((place) =>

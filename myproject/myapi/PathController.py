@@ -57,7 +57,6 @@ class PathController:
             location_data = self.fetch_location_data(location_id)
             reasonable_route.append(location_data)
 
-        print("reasonable route yo: ", reasonable_route)
         return reasonable_route
     
     # This function returns a random LocationID from the Locations table that has the associated LocationType

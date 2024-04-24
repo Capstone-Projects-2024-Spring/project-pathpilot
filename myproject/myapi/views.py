@@ -74,8 +74,12 @@ def calculate_route(request):
 @api_view(['GET'])
 def get_saved_routes(request):
     if request.method == 'GET':
-        print("current_user = ", request.user)
-        return JsonResponse({'user': request.user.username})
+        saved_routes_controller = SavedRoutesController()
+        id = request.GET.get('id')
+        routes_ids = saved_routes_controller.getSavedRoutes(id)
+        routes_info = saved_routes_controller.getLocationInfo(routes_ids)        
+
+        return JsonResponse({'routes': routes_info})
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
  

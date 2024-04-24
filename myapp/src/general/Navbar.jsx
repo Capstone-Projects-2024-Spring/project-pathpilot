@@ -11,6 +11,7 @@ import AirplanePath from './img/airplane.svg';
 const NavbarBoot = () => {
   const handleLogOut = () => {
     localStorage.removeItem("username");
+    localStorage.removeItem("id");
     window.location.reload();
     console.log(localStorage.getItem("username"));
   }
