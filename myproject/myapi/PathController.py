@@ -1,7 +1,6 @@
 import random
 import sqlite3
 import requests
-from local_settings import GOOGLE_ROUTING_API_KEY
 import json
 from operator import itemgetter
 
