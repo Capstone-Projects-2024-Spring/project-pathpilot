@@ -56,9 +56,10 @@ def user_create_account(request):
 def calculate_route(request):
     if request.method == 'POST':
         location_types = request.data.get('locationTypes')
+        attributes = request.data.get('attributesToSend')
 
         path_controller = PathController()
-        route = path_controller.calculateReasonableRoute(location_types)
+        route = path_controller.calculateReasonableRoute(location_types, attributes)
         polyline = path_controller.calculatePolyline(route)
 
         if route:

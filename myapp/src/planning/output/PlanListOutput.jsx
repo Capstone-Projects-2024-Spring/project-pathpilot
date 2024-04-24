@@ -5,7 +5,7 @@ import { AddSavedTrip } from './AddSavedTrip.js';
 
 const user_id = localStorage.getItem("id")
 
-const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) => {
+const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions, attributeList, updateAttributeList }) => {
     const locationsList = [
         "place1","place2","place3"
     ];
@@ -15,6 +15,7 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
     const ReturnToInput = () => {
         updateLocations(null);
         updateAdvancedOptions(false);
+        updateAttributeList([]);
     }
 
 const SaveRouteToAccount = async () => {
@@ -72,7 +73,11 @@ const SaveRouteToAccount = async () => {
                                         <div>
                                         {attribute === -1 ? <div></div> :
                                         <div className="individual-attribute-holder">
-                                            <div className="individual-attribute">{attribute}</div>
+                                            {
+                                                attributeList.includes(attribute) ? 
+                                                <div className="individual-attribute-selected">{attribute}</div> : 
+                                                <div className="individual-attribute">{attribute}</div>
+                                            }
                                         </div>
                                         }
                                         </div>
