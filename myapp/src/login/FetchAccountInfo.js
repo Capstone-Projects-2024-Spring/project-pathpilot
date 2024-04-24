@@ -8,8 +8,10 @@ export const FetchAccountInfo = async (username, password) => {
             username,
             password
         });
+        
         console.log(response);
         localStorage.setItem("username",response.data.user);
+        localStorage.setItem("id",response.data.id);
         console.log(localStorage.getItem("username"));
         return response.data;
     } catch (error) {

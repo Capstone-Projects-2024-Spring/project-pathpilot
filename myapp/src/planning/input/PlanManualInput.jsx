@@ -82,7 +82,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         } else {
             const index = selectedTypeLocations.indexOf(e.target.value);
             selectedTypeLocations.splice(index,1);
-            console.log(selectedTypeLocations);
+            //console.log(selectedTypeLocations);
         }
     }
 
@@ -92,7 +92,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         } else {
             const index = selectedAttributes.indexOf(e.target.value);
             selectedAttributes.splice(index,1);
-            console.log(selectedAttributes);
+            //console.log(selectedAttributes);
         }
     }
 
@@ -116,6 +116,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
+            //console.log(JSON.parse(pathData.route[0][9]));
             setLoading(false);
             console.log(JSON.parse(pathData.route[0][9]));
             pathData ? setLocations(pathData.route) : console.log("ERROR");
@@ -129,9 +130,9 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             console.log("ERROR")
         }
     }
-    console.log(locations);
-    console.log(path);
-    
+    //console.log("locations = ", locations);
+    //console.log("path = ", path);
+
     
     return (
         <div className='input-padding'>
@@ -142,7 +143,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                 <div>
                     <FormControlLabel control={<Checkbox value={type.value} onChange={handleTypeChange}/>} label={type.label} />
                     {
-                        console.log("Value " + selectedTypeLocations)
+                        //console.log("Value " + selectedTypeLocations)
                     }
                 </div>
                 )
@@ -155,6 +156,18 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                         <br></br>
                         <div className='advanced-options-title' onClick={handleAdvanceOptions}>Minimize Advanced Options</div>
                         <h3>Type of trip</h3>
+                        <FormGroup>
+                        {
+                            TripAttributes?.map((attribute) =>
+                            <div>
+                                <FormControlLabel control={<Checkbox value={attribute.value} onChange={handleAttributeChange}/>} label={attribute.label} />
+                                {
+                                    //console.log("Value " + attribute.value)
+                                }
+                            </div>
+                            )
+                        }
+                        </FormGroup>
                         <Select
                             isMulti
                             name="colors"

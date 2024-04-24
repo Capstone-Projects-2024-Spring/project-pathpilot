@@ -1,6 +1,7 @@
 import random
 import sqlite3
 import requests
+from local_settings import GOOGLE_ROUTING_API_KEY
 import json
 from operator import itemgetter
 
@@ -215,7 +216,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "key-here"
+                "X-Goog-Api-Key": GOOGLE_ROUTING_API_KEY
             }
 
             response = requests.post(url, json=params, headers=header)
