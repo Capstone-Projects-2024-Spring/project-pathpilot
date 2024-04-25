@@ -6,14 +6,28 @@ from operator import itemgetter
 
 class PathController:
 
+    # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
     neighborhood_zip_map = {
-        "Bella Vista / Queens Village / Pennsport": ["19147"],
-        "Fishtown / Callowhill / Northern Liberties": ["19125", "19123"],
-        "Fairmount / Spring Garden": ["19130"],
-        "Rittenhouse Square / Logan Square": ["19102", "19103", "19146"],
-        "Chinatown / Old City": ["19107", "19106"],
-        "North Broad": ["19121", "19132"],
-        "Spruce Hill / Cedar Park / Point Breeze": ["19104", "19146"]
+    # Bella Vista / Queens Village / Pennsport
+    1: ["19147"],
+    
+    # Fishtown / Callowhill / Northern Liberties
+    2: ["19125", "19123"],
+    
+    # Fairmount / Spring Garden
+    3: ["19130"],
+    
+    # Rittenhouse Square / Logan Square
+    4: ["19102", "19103", "19146"],
+    
+    # Chinatown / Old City
+    5: ["19107", "19106"],
+    
+    # North Broad
+    6: ["19121", "19132"],
+    
+    # Spruce Hill / Cedar Park / Point Breeze
+    7: ["19104", "19146"]
     }
 
     # Measured In Feet
@@ -32,8 +46,7 @@ class PathController:
         attempted_starting_locations = set()
         search_radius = PathController.INITIAL_SEARCH_RADIUS
         last_location = None
-        zip_codes = self.neighborhood_zip_map[neighborhood]
-        print(zip_codes)
+        zip_codes = self.neighborhood_zip_map[neighborhood] if neighborhood is not None else None
 
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
@@ -84,7 +97,10 @@ class PathController:
         if last_location is None:
 
             # Fetch all locations of specified location type
-            cursor.execute(f"SELECT id, attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
+            if zip_codes != None:
+                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
+            else:
+                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
@@ -137,7 +153,10 @@ class PathController:
             lon_range = search_radius / PathController.FEET_PER_DEGREE_LON
 
             # Fetch nearby locations within the latitude and longitude ranges
-            cursor.execute(f"SELECT id, attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))}) AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})", zip_codes)
+            if zip_codes != None:
+                cursor.execute(f"SELECT id, attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))}) AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})", zip_codes)
+            else:
+                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
 
@@ -227,7 +246,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "key-here"
+                "X-Goog-Api-Key": "AIzaSyDAn2xcP0vXpMmi6VkKMs5X3YQyttH2CqQ"
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -239,7 +258,7 @@ class PathController:
     
 location_types=['1','2']
 attributes=[]
-neighborhood = "North Broad"
+neighborhood = 2
 
 path_controller = PathController()
 route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)

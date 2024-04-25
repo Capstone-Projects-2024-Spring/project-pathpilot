@@ -7,7 +7,8 @@ const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neig
         const attributesToSend = attributes.map(attribute => attribute.value)
         const response = await axios.post(`${fetchPathURL}`, {
             locationTypes,
-            attributesToSend
+            attributesToSend,
+            neighborhood
         });
         console.log(response.data);
         console.log(response.data.polyline);
