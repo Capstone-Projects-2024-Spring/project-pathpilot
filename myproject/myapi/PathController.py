@@ -6,6 +6,16 @@ from operator import itemgetter
 
 class PathController:
 
+    neighborhood_zip_map = {
+        "Bella Vista / Queens Village / Pennsport": ["19147"],
+        "Fishtown / Callowhill / Northern Liberties": ["19125", "19123"],
+        "Fairmount / Spring Garden": ["19130"],
+        "Rittenhouse Square / Logan Square": ["19102", "19103", "19146"],
+        "Chinatown / Old City": ["19107", "19106"],
+        "North Broad": ["19121", "19132"],
+        "Spruce Hill / Cedar Park / Point Breeze": ["19104", "19146"]
+    }
+
     # Measured In Feet
     INITIAL_SEARCH_RADIUS = 3000
     SEARCH_RADIUS_LIMIT = 5000
@@ -16,18 +26,20 @@ class PathController:
     def __init__(self):
         self.conn = sqlite3.connect('db.sqlite3')
 
-    def calculateReasonableRoute(self, location_types, attributes):
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
         search_radius = PathController.INITIAL_SEARCH_RADIUS
         last_location = None
+        zip_codes = self.neighborhood_zip_map[neighborhood]
+        print(zip_codes)
 
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes)
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -63,7 +75,7 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes):
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes):
 
         # Initialize database connection cursor
         cursor = self.conn.cursor()
@@ -72,7 +84,7 @@ class PathController:
         if last_location is None:
 
             # Fetch all locations of specified location type
-            cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
+            cursor.execute(f"SELECT id, attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
             locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
@@ -125,7 +137,7 @@ class PathController:
             lon_range = search_radius / PathController.FEET_PER_DEGREE_LON
 
             # Fetch nearby locations within the latitude and longitude ranges
-            cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
+            cursor.execute(f"SELECT id, attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))}) AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})", zip_codes)
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
 
@@ -227,9 +239,10 @@ class PathController:
     
 location_types=['1','2']
 attributes=[]
+neighborhood = "North Broad"
 
 path_controller = PathController()
-route = path_controller.calculateReasonableRoute(location_types, attributes)
+route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)
 
 if route:
     print(route)
