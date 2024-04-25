@@ -1,0 +1,16 @@
+.location-group {
+    background-color: #f0f0f0; /* Example background color */
+    padding: 10px; /* Add padding for spacing */
+    margin-bottom: 20px; /* Add margin for separation between groups */
+    border-radius: 8px; /* Add border radius for rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add box shadow for depth */
+}
+
+.location-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .location-number {
+    margin-right: 10px; /* Adjust as needed */
+  }

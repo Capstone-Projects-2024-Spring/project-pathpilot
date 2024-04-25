@@ -11,6 +11,7 @@ import AirplanePath from './img/airplane.svg';
 const NavbarBoot = () => {
   const handleLogOut = () => {
     localStorage.removeItem("username");
+    localStorage.removeItem("id");
     window.location.reload();
     console.log(localStorage.getItem("username"));
   }
@@ -30,6 +31,7 @@ const NavbarBoot = () => {
             <Nav.Link as={Link} to="/">Home</Nav.Link>
             <Nav.Link as={Link} to="/signup">Sign Up</Nav.Link>
             <Nav.Link as={Link} to="/planning">Planning</Nav.Link>
+            <Nav.Link as={Link} to="/savedroutes">Saved Routes</Nav.Link>
             </Nav>
             <Nav className="ml-auto">
             {

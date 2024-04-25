@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Rating } from '@mui/material';
-import {LocationTypes} from '../input/LocationTypes.js';
+import { LocationTypes } from '../input/LocationTypes.js';
+import { AddSavedTrip } from './AddSavedTrip.js';
+
+const user_id = localStorage.getItem("id")
 
 const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions, attributeList, updateAttributeList }) => {
     const locationsList = [
@@ -15,17 +18,33 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions, att
         updateAttributeList([]);
     }
 
+const SaveRouteToAccount = async () => {
+    try {
+        AddSavedTrip(locations, user_id)
+
+    } catch {
+        console.log("ERROR")
+    }
+}
+    
     return (
         <div>
-            <div className='start-again-button-container'>
-                <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
+            <div className='start-again-and-save-route-button-container'>
+                <div className='start-again-button-container'>
+                    <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
+                </div>
+                <div className='start-again-button-container'>
+                    {user_id && (
+                    <button className='submit-button' onClick={SaveRouteToAccount}>Save Route</button>
+                    )}
+                </div>
             </div>
+
             {
             locations ? 
             locations.map((place) =>
                 <>
                     <div className="list-places">
-                        {console.log(place)}
                         <div className='place-intro-container'>
                             <div className="place-count-container">
                                 <div className="place-count">{count++}</div>
