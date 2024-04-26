@@ -10,7 +10,9 @@ const LocationTypes = [
     {value: 7, label: 'Park'},
     {value: 8, label: 'Vintage Shop'},
     {value: 9, label: 'Bakery'},
-    {value: 10, label: 'Activity'}
+    {value: 10, label: 'Activity'},
+    {value: 12, label: 'Bagel Shop'},
+    {value: 14, label: 'Novelty Shop'}
 ]
 
 export {LocationTypes};
