@@ -6,6 +6,7 @@ import HomePage from './home/HomePage.js';
 import Login from './login/Login.js'
 import Signup from './signup/Signup.js'
 import PathPlanning from './planning/PathPlanning.js'
+import SavedRoutes from './savedroutes/SavedRoutes.js'
 import NavbarBoot from './general/Navbar.jsx';
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom"
 
@@ -19,6 +20,7 @@ root.render(
         <Route path="/Login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
         <Route path='/Planning' element={<PathPlanning />} />
+        <Route path='/SavedRoutes' element={<SavedRoutes />} />
       </Routes>
     </Router>
   </div>

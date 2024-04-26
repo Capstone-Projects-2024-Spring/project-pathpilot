@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Rating } from '@mui/material';
-import {LocationTypes} from '../input/LocationTypes.js';
+import { LocationTypes } from '../input/LocationTypes.js';
+import { AddSavedTrip } from './AddSavedTrip.js';
 
-const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) => {
+const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions, attributeList, updateAttributeList }) => {
+    const user_id = localStorage.getItem("id");
     const locationsList = [
         "place1","place2","place3"
     ];
@@ -12,19 +14,35 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
     const ReturnToInput = () => {
         updateLocations(null);
         updateAdvancedOptions(false);
+        updateAttributeList([]);
     }
 
+const SaveRouteToAccount = async () => {
+    try {
+        await AddSavedTrip(locations, user_id);
+    } catch {
+        console.log("ERROR");
+    }
+}
+    
     return (
         <div>
-            <div className='start-again-button-container'>
-                <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
+            <div className='start-again-and-save-route-button-container'>
+                <div className='start-again-button-container'>
+                    <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
+                </div>
+                <div className='start-again-button-container'>
+                    {user_id && (
+                    <button className='submit-button' onClick={SaveRouteToAccount}>Save Route</button>
+                    )}
+                </div>
             </div>
+
             {
             locations ? 
             locations.map((place) =>
                 <>
                     <div className="list-places">
-                        {console.log(place)}
                         <div className='place-intro-container'>
                             <div className="place-count-container">
                                 <div className="place-count">{count++}</div>
@@ -53,7 +71,11 @@ const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions }) =
                                         <div>
                                         {attribute === -1 ? <div></div> :
                                         <div className="individual-attribute-holder">
-                                            <div className="individual-attribute">{attribute}</div>
+                                            {
+                                                attributeList.includes(attribute) ? 
+                                                <div className="individual-attribute-selected">{attribute}</div> : 
+                                                <div className="individual-attribute">{attribute}</div>
+                                            }
                                         </div>
                                         }
                                         </div>

@@ -75,12 +75,12 @@ test('Check advanced options', async () => {
     const typeElement = screen.getByText('Type of trip');
     expect(typeElement).toBeInTheDocument();
 
-    const attributeElement = screen.getByLabelText('Romantic');
-    fireEvent.click(attributeElement);
-    expect(attributeElement.checked).toBe(true);
+    const selectAttributes = screen.getByTestId("attribute-select");
+    expect(selectAttributes).toBeInTheDocument();
 
-    fireEvent.click(attributeElement);
-    expect(attributeElement.checked).toBe(false);
+    fireEvent.keyDown(selectAttributes.firstChild, { key: 'ArrowDown' });
+    await screen.findByText('Adults-Only');
+    fireEvent.click(screen.getByText('Adults-Only'));
 
     const selectCost = screen.getByTestId("cost-select");
     expect(selectCost).toBeInTheDocument();

@@ -32,6 +32,8 @@ body {
 
 .output-padding {
     padding: 2rem;
+    position: sticky;
+    top: 0;
 }
 
 .input-option-select {
@@ -50,15 +52,21 @@ body {
     cursor: pointer;
 }
 
+.start-again-and-save-route-button-container {
+    display: flex;
+    justify-content: center; /* Align buttons horizontally */
+    margin: auto;
+}
+
 .submit-button-container {
     margin: auto;
 }
 
 .start-again-button-container {
     margin: auto;
+    justify-content: center;
     padding-top: 1rem;
     padding-bottom: 1rem;
-    background-color: rgb(212, 219, 225);
 }
 
 .submit-button {
@@ -68,11 +76,11 @@ body {
     font-size: larger;
     border: none;
     height: 3rem;
-    width: 20%;
-    min-width: 100px;
+    width: 50%;
+    min-width: 150px;
     border-radius: 4px;
     display: block;
-    margin: auto;
+    margin: 0 1rem; /* Add space between buttons */
 }
 
 .submit-button:hover:enabled {
@@ -160,7 +168,17 @@ body {
 }
 
 .individual-attribute {
-    background-color: rgb(207, 211, 215);
+    background-color: rgb(204, 223, 243);
+    border-radius: 4px;
+    padding: 10px;
+    font-weight: bold;
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.individual-attribute-selected {
+    background-color: rgb(245, 247, 221);
     border-radius: 4px;
     padding: 10px;
     font-weight: bold;
