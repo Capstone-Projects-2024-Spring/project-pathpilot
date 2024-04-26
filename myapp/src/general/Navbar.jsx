@@ -36,7 +36,7 @@ const NavbarBoot = () => {
               localStorage.getItem("username") !== null ?
                 <Container><Navbar.Text>{localStorage.getItem("username")}</Navbar.Text>
                 <Navbar.Text className='log-out' onClick={handleLogOut}>Log Out</Navbar.Text></Container>
-                : <Nav.Link as={Link} to="/login">Log in</Nav.Link>
+                : <div data-testid="log-in-link"><Nav.Link as={Link} to="/login">Log in</Nav.Link></div>
             }
           </Nav>
         </Container>

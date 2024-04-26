@@ -1,5 +1,4 @@
 import React, { useState,useEffect } from 'react';
-import FetchMap from './FetchMap.js';
 
 const PlanMapOutput = ({ locations, poly }) => {
     const [map, setMap] = useState(null);

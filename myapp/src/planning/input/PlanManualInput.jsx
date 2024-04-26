@@ -111,7 +111,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
             pathData ? setLocations(pathData.route) : console.log("ERROR");
             pathData ? updateLocations(pathData.route) : console.log("ERROR");
             pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
-
+            console.log("for test");
             //pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? updatePath(pathData.path) : console.log("ERROR");
         } catch {
@@ -177,20 +177,24 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly })
                         </div>
             
                         <h3>Preferred Neighborhood</h3>
-                        <Select
-                            className='input-option-select'
-                            onChange={choice => setNeighborhoodChoice(choice.value)}
-                            options={neighborhoods}
-                            placeholder="Select Neighborhood..."
-                        />
+                        <div data-testid="neighborhood-select">
+                            <Select
+                                className='input-option-select'
+                                onChange={choice => setNeighborhoodChoice(choice.value)}
+                                options={neighborhoods}
+                                placeholder="Select Neighborhood..."
+                            />
+                        </div>
             
                         <h3>Located Near A</h3>
-                        <Select
-                            className='input-option-select'
-                            onChange={choice => setLocatedNear(choice.value)}
-                            options={locatedNearLocations}
-                            placeholder="Select Locations..."
-                        />
+                        <div data-testid="locatednear-select">
+                            <Select
+                                className='input-option-select'
+                                onChange={choice => setLocatedNear(choice.value)}
+                                options={locatedNearLocations}
+                                placeholder="Select Locations..."
+                            />
+                        </div>
                     </div>
                 : <div className='advanced-options-title' onClick={handleAdvanceOptions}>Advanced Options</div>
             }

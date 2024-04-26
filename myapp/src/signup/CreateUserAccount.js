@@ -9,6 +9,7 @@ export const CreateUserAccount = async (username, password, email) => {
             password,
             email
         });
+        console.log(response);
         return response.data;
 
     } catch (error) {
