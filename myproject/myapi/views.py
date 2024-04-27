@@ -57,9 +57,10 @@ def calculate_route(request):
     if request.method == 'POST':
         location_types = request.data.get('locationTypes')
         attributes = request.data.get('attributesToSend')
+        neighborhood = request.data.get('neighborhood')
 
         path_controller = PathController()
-        route = path_controller.calculateReasonableRoute(location_types, attributes)
+        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)
         polyline = path_controller.calculatePolyline(route)
 
         if route:
