@@ -41,30 +41,22 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         { value: 5, label: '5 Stars' }
     ];
 
+    // Ensure this is in sync with zip_code_mapping in PathController.py
     const neighborhoods = [
-        { value: 'bella vista', label: 'Bella Vista' },
-        { value: 'callowhill', label: 'Callowhill' },
-        { value: 'chinatown', label: 'Chinatown' },
-        { value: 'east passyunk', label: 'East Passyunk' },
-        { value: 'fairhill', label: 'Fairhill' },
-        { value: 'fairmount', label: 'Fairmount' },
-        { value: 'fishtown', label: 'Fishtown' },
-        { value: 'graduate hospital', label: 'Graduate Hospital' },
-        { value: 'logan square', label: 'Logan Square' },
-        { value: 'market east', label: 'Market East' },
-        { value: 'midtown village', label: 'Midtown Village' },
-        { value: 'northern liberties', label: 'Northern Liberties' },
-        { value: 'old city', label: 'Old City' },
-        { value: 'pennsport', label: 'Pennsport' },
-        { value: 'powelton village', label: 'Powelton Village' },
-        { value: 'queen village', label: 'Queen Village' },
-        { value: 'rittenhouse square', label: 'Rittenhouse Square' },
-        { value: 'society hill', label: 'Society Hill' },
-        { value: 'spring garden', label: 'Spring Garden' },
-        { value: 'spruce hill and cedar park', label: 'Spruce Hill and Cedar Park' },
-        { value: 'university city', label: 'University City' },
-        { value: 'washington square west', label: 'Washington Square West' },
-        { value: 'north broad', label: 'North Broad'}
+        { value: 1, label: 'Bella Vista / Queens Village / Pennsport' },
+        // 19147
+        { value: 2, label: 'Fishtown / Callowhill / Northern Liberties' },
+        // 19125, 19123
+        { value: 3, label: 'Fairmount / Spring Garden' },
+        // 19130
+        { value: 4, label: 'Rittenhouse Square / Logan Square' },
+        // 19102, 19103, 19146
+        { value: 5, label: 'Chinatown / Old City' },
+        // 19107, 19106
+        { value: 6, label: 'North Broad' },
+        // 19121, 19132
+        { value: 7, label: 'Spruce Hill / Cedar Park / Point Breeze' },
+        // 19104, 19146
     ];
 
     const locatedNearLocations = [
