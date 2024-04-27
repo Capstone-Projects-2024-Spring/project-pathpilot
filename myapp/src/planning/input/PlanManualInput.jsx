@@ -156,18 +156,6 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                         <br></br>
                         <div className='advanced-options-title' onClick={handleAdvanceOptions}>Minimize Advanced Options</div>
                         <h3>Type of trip</h3>
-                        <FormGroup>
-                        {
-                            TripAttributes?.map((attribute) =>
-                            <div>
-                                <FormControlLabel control={<Checkbox value={attribute.value} onChange={handleAttributeChange}/>} label={attribute.label} />
-                                {
-                                    //console.log("Value " + attribute.value)
-                                }
-                            </div>
-                            )
-                        }
-                        </FormGroup>
                         <Select
                             isMulti
                             name="colors"
