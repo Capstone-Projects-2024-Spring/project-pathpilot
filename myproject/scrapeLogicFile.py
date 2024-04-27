@@ -19,13 +19,13 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "parks"
-ZIPCODEINPUT = 19122
+PLACETYPE = "restaurants"
+ZIPCODEINPUT = 19130
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
 def createURL(zipcode, loType):
-    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}&cflt=parks"
+    url = f"https://www.yelp.com/search?find_desc={loType}&find_loc=Philadelphia%2C+PA+{zipcode}"
     print(loType)
     return url
 
@@ -93,45 +93,53 @@ def insideProcess(url, restaurantList, numOrder):
 def parseInsideRequest(response): #returns all information, from business's own page
     informationDict = {}
     data = BeautifulSoup(response, 'html.parser')
-    data1 = data.find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
-    extraInfo = []
-    for header in data.find_all(class_="photo-header-content-container__09f24__jDLBB css-1qn0b6x"):
-        for name in header.find_all(class_="css-hnttcw"):
+    if(data==None):
+        print("nothing in here")
+    data1 = data.find_all(class_ = "biz-details-page-container-inner__09f24__L9S07 yelp-emotion-1iy1dwt")
+    #find_all(class_ = "biz-details-page-container-outer__09f24__pZBzx css-1qn0b6x")
+    #print(data1) #THIS IS RETURNING EMPTY
+    extraInfo = [] #class_="photo-header-content-container__09f24__jDLBB css-1qn0b6x"
+    for header in data.find_all(class_="photo-header-content-container__09f24__jDLBB yelp-emotion-1iy1dwt"):
+        for name in header.find_all(class_="yelp-emotion-sfde2o"):
             if(name.text!=None):
                 name = name.text
                 name = unicodedata.normalize('NFKD', name) #gets rid of html converter issues
                 extraInfo.append(name)
-        for ratingSect in header.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-v3nuob"):
-            for rating in ratingSect.find_all(class_="css-1fdy0l5"):
+        for ratingSect in header.find_all(class_="arrange__09f24__LDfbs gutter-1-5__09f24__vMtpw vertical-align-middle__09f24__zU9sE yelp-emotion-cluvhg"):
+            for rating in ratingSect.find_all(class_="yelp-emotion-1sphrcy"):
                 if(rating!=None and rating.text!="Unclaimed "): #idk who had the unclaimed issue so both are here to be safe
                     extraInfo.append(rating.text)
-        for price in header.find_all(class_="css-14r9eb"):
+        for price in header.find_all(class_="yelp-emotion-1ez2c9z"):
             if(price!=None and price.text!="Unclaimed "):
                 extraInfo.append(price.text) #search database for $ to find out if its there idk, clean up later
-    for i in data1:
+    for i in data1: #NOT WORKING
         addressArray = []
-        for locationOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg css-1qn0b6x"):
-            for strAddress in locationOuter.find_all(class_ = "raw__09f24__T4Ezm"):
+        for locationOuter in i.find_all(class_ = "yelp-emotion-1b4ss4q"):
+            for strAddress in locationOuter.find_all(class_ = "yelp-emotion-y7d6x3"):
                 if(strAddress!= None): #gets street and zip
                     addressArray.append(strAddress.text)
-        for hoursOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
-            for table in hoursOuter.find_all(class_="hours-table__09f24__KR8wh css-n604h6"):
+                    print(strAddress.text)
+        for hoursOuter in i.find_all(class_ = "arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG yelp-emotion-1iy1dwt"):
+            for table in hoursOuter.find_all(class_="hours-table__09f24__KR8wh yelp-emotion-16hyog2"):
                # daysArray=[]
                 hoursArray = []
-                for row in table.find_all(class_="css-29kerx"):
-                    for day in row.find_all(class_=["day-of-the-week__09f24__JJea_ css-1p9ibgf", "day-of-the-week__09f24__JJea_ css-ux5mu6"]): #day-of-the-week__09f24__JJea_ css-1p9ibgf
+                for row in table.find_all(class_="yelp-emotion-29kerx"):
+                    for day in row.find_all(class_=["day-of-the-week__09f24__JJea_ yelp-emotion-1be33sw", "day-of-the-week__09f24__JJea_ yelp-emotion-ux5mu6"]): #day-of-the-week__09f24__JJea_ css-1p9ibgf
                         if(day!=None):
                             hoursArray.append(day.text)
-                    for hours in row.find_all(class_="no-wrap__09f24__c3plq css-1p9ibgf"): #working under presumption of Mon-Sun
+                    for hours in row.find_all(class_="no-wrap__09f24__c3plq yelp-emotion-1be33sw"): #working under presumption of Mon-Sun
                         if(hours.text!=None):
                             hoursArray.append(hours.text) #should come hoursArray and extra Info into one array
                # print(daysArray)
                 #print(hoursArray)
         numTraits=0
-        for attributesTable in i.find_all(class_= "css-ufd2i"):
+        for attributesTable in i.find_all(class_= "yelp-emotion-1l2jex2"): #yelp-emotion-1iy1dwt
             attributeArray = []
-            for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg css-1qn0b6x"):
-                for trait in attributesSection.find_all(class_="arrange-unit__09f24__rqHTg arrange-unit-fill__09f24__CUubG css-1qn0b6x"):
+            print("passed round 1")
+            for attributesSection in attributesTable.find_all(class_="arrange-unit__09f24__rqHTg yelp-emotion-1iy1dwt"):
+                print("passed round 2")
+                for trait in attributesSection.find_all(class_="yelp-emotion-1be33sw"):
+                    print("passed round 3")
                     if(trait!=None):
                         numTraits+=1
                         attribute = trait.text
@@ -157,6 +165,12 @@ def parseInsideRequest(response): #returns all information, from business's own 
                                 attributeArray.append(attribute)
                             case "Free Wi-Fi": #added for coffee shops
                                 attributeArray.append(attribute)
+                            case "Gluten-Free Options": #added for bakeries, wasn't used for restaurants
+                                attributeArray.append(attribute)
+                            case "Offers Takeout": #bakeries
+                                attributeArray.append(attribute)
+                            case "Vegan Options": #bakeries
+                                attributeArray.append(attribute)
                             case "Quiet" | "Loud" | "Moderate Noise": #added for coffee shops
                                 attributeArray.append(attribute)
                             case attribute if "Classy" in attribute and "Classy" not in attributeArray:
@@ -174,11 +188,14 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             #case attribute if "Estimated Health Score" in attribute:
                             #    attributeArray.append("Trendy")
                             case "Accepts Credit Cards":
+                                #if(trait.find(class_="css-qyp8bo")!=None): #if it has the class differentiator for the x (not check)
+                                #    attributeArray.append("Does Not Accept credit Cards")
+                                #else: #if it doesn't have that class
                                 attributeArray.append(attribute)
                 
     
                             
-            
+            print(attributeArray)
             if(attributeArray!=[]):
                 informationDict = {
                 "information": extraInfo,
@@ -224,10 +241,10 @@ def genInsideURL(insideURL):
             try:
                 print("found it")
                 driver.find_element(By.XPATH, '//*[@id="main-content"]/section[2]/div[2]/button').click() #book stores for some reason
-            except NoSuchElementException:
+            except NoSuchElementException: 
                 print("no button")
             except ElementNotInteractableException:
-                print("no clicky")
+                print("no clicky") 
         except ElementNotInteractableException:
             print("no clicky")
     except ElementNotInteractableException:
@@ -270,8 +287,8 @@ def addtoDatabase(infoDict):
     if(infoDict["address"][0] != -1 and infoDict["address"][1]!= -1):
         if(len(infoDict["address"])==3): #example: ['Philadelphia, PA 19122', 39.9527237, -75.1635262] it's a fake lat and long so we don't want it
             address = infoDict["address"][0]
-            latitude = -1
-            longitude = -1
+            latitude = infoDict["address"][1] #changed these from -1 because it became ['261 S 21st St Philadelphia, PA 19103', 39.94893355, -75.17593076058515]
+            longitude = infoDict["address"][2]
         if(len(infoDict["address"])==4):
             address = infoDict["address"][0]  + " " + infoDict["address"][1]
             latitude = infoDict["address"][2]
@@ -289,6 +306,8 @@ def addtoDatabase(infoDict):
         latitude = infoDict["address"][0]
         longitude = infoDict["address"][1]
     if(len(infoDict["attributes"])!=0):
+        if (len(infoDict["attributes"])>1):
+            infoDict["attributes"] = infoDict["attributes"][1:] #delete the -1 at the beginning if it has more than that
         attributes = infoDict["attributes"] #convert to json when putting it in there
     else:
         attributes = -1
@@ -312,8 +331,23 @@ def addtoDatabase(infoDict):
             loTypeID = 6
         case "parks":
             loTypeID = 7
+        case "vintage+shops":
+            loTypeID = 8
+        case "bakeries":
+            loTypeID = 9
+        case "mini+golf" | "bowling" | "barcade" | "ping+pong" | "axe+throwing" | "candle+making" | "rock+climbing" | "zoo" | "five+iron":
+            loTypeID = 10
+        case "parking+garage" | "parking+lot":
+            loTypeID = 11
+        case "bagels":
+            loTypeID = 12
+        case "public+transit":
+            loTypeID = 13
+        case "alis+wagon" | "gift+shop" | "paper+source" | "greeting+card" | "occasionette" | "art+star"| "common+ground"|"ritual+shoppe"|"open+house"|"nice+things+handmade"|"south+fellini"|"moon+arrow"|"love+yourself"|"mitchell+ness"|"trunc"|"vix+emporium":
+            loTypeID = 14
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
+    print("hey")
     conn = sqlite3.connect('myproject/db.sqlite3')
     print("opened database successfully")
     cursor = conn.cursor()
@@ -361,7 +395,8 @@ def main():
             print("Longitude: " + str(longitude))
             addtoDatabase(value)
     print('Here we go')
-    while(numb<=9 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
+    #numb=31
+    while(numb<=30 and numb>=1): #cap at 300 to be safe, unlikely beyond that, program just stops when it cant reach site anymore
         #change up to number based on needs
         val = numb*10
         tempUrl= url + f"&start={val}"
