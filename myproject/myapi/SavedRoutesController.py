@@ -29,7 +29,6 @@ class SavedRoutesController:
 
             return locations_data
 
-
         except Exception as e:
         
             print("Error retrieving location info:", e)
@@ -70,6 +69,7 @@ class SavedRoutesController:
 
     def addSavedRoute(self, user_id, locations):
 
+        print("them locations yo, ", locations)
         # Initialize database connection cursor
         cursor = self.conn.cursor()
 
@@ -89,10 +89,26 @@ class SavedRoutesController:
             print("Error inserting data:", e)
         finally:
             self.conn.commit()
-            self.conn.close()
+            cursor.close()
 
-    def deleteSavedRoute(user):
-        pass
-    
-    def getCurrentAccount():
-        pass
+    def deleteAllSavedRoutes(self):
+        cursor = self.conn.cursor()
+
+        try:
+            # Initialize database connection cursor
+            cursor = self.conn.cursor()
+
+            # Delete all entries from myapi_savedroutelocation
+            cursor.execute("DELETE FROM myapi_savedroutelocation")
+
+            # Delete all entries from myapi_savedroute
+            cursor.execute("DELETE FROM myapi_savedroute")
+
+            print("All entries deleted successfully.")
+
+        except sqlite3.Error as e:
+            print("Error deleting entries:", e)
+
+        finally:
+            self.conn.commit()
+            cursor.close()

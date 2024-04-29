@@ -168,9 +168,6 @@ class PathController:
         location_data = cursor.fetchone()
         return location_data
 
-    def favoriteRoute(route):
-        pass
-
     def calculatePolyline(self, route):
         url = ' https://routes.googleapis.com/directions/v2:computeRoutes'
 
@@ -215,23 +212,10 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "key-here"
+                "X-Goog-Api-Key": "AIzaSyDX4WHpiJfi_ITA2Tt3HUtzkJ67B999TG0"
             }
 
             response = requests.post(url, json=params, headers=header)
             return response.json()
         else:
             return None
-
-# Simple Algorithm Test
-    
-location_types=['1','2']
-attributes=[]
-
-path_controller = PathController()
-route = path_controller.calculateReasonableRoute(location_types, attributes)
-
-if route:
-    print(route)
-else:
-    print("route error")
