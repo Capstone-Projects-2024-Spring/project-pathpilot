@@ -16,7 +16,10 @@ const TripAttributes = [
     {value: 'Classy', label: 'Classy'},
     {value: 'Casual', label: 'Casual'},
     {value: 'Romantic', label: 'Romantic'},
-    {value: 'Trendy', label: 'Trendy'}
+    {value: 'Trendy', label: 'Trendy'},
+    {value: 'Accepts Credit Cards', label: 'Accepts Credit Cards'},
+    {value: 'Offers Takeout', label: 'Offers Takeout'},
+    {value: 'Vegan Options', label: 'Vegan Options'}
 ]
 
 export {TripAttributes};

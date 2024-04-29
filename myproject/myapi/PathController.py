@@ -3,6 +3,7 @@ import sqlite3
 import requests
 import json
 from operator import itemgetter
+import multiprocessing
 
 class PathController:
 
@@ -31,67 +32,21 @@ class PathController:
     }
 
     # Measured In Feet
-    INITIAL_SEARCH_RADIUS = 3000
+    INITIAL_SEARCH_RADIUS = 2000
     SEARCH_RADIUS_LIMIT = 5000
 
     FEET_PER_DEGREE_LAT = 364000
     FEET_PER_DEGREE_LON = 288200
 
-    def __init__(self):
-        self.conn = sqlite3.connect('db.sqlite3')
 
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood):
-        # Initialize variables
-        route_ids = []
-        attempted_starting_locations = set()
-        search_radius = PathController.INITIAL_SEARCH_RADIUS
-        last_location = None
-        zip_codes = self.neighborhood_zip_map[neighborhood] if neighborhood is not None else None
-
-        # Continue until the route includes locations for all location types
-        while len(route_ids) != len(location_types):
-                
-                # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes)
-
-                # If nearby location is found, add location to route
-                if location_id > 0:
-                    route_ids.append(location_id)
-                    last_location = location_id
-
-                # If no nearby location is found, backtrack to previous location
-                elif location_id == 0:
-                    location_id = route_ids.pop()
-
-                    # If the starting location can not be used for a reasonable route with the current search radius, mark it as attempted
-                    if len(route_ids) == 0:
-                        attempted_starting_locations.add(location_id)
-
-                # If there are no more valid starting locations, broaden the search radius and retry all attempted starting locations
-                else:
-                    search_radius += 1000
-                    attempted_starting_locations.clear()
-
-                    # If search radius exceeds limit, return None
-                    if search_radius > PathController.SEARCH_RADIUS_LIMIT:
-                        return None
-
-        # Return the calculated route as a list of locations w/ all information included
-        reasonable_route = []
-        for location_id in route_ids:
-            location_data = self.fetch_location_data(location_id)
-            reasonable_route.append(location_data)
-
-        return reasonable_route
-    
     # This function returns a random LocationID from the Locations table that has the associated LocationType
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
     def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes):
-
+        conn = sqlite3.connect('db.sqlite3')
         # Initialize database connection cursor
-        cursor = self.conn.cursor()
+        cursor = conn.cursor()
 
         # If route is currently empty, select a random starting location
         if last_location is None:
@@ -108,6 +63,7 @@ class PathController:
             
             # IF there are no more unattempted starting_locations, return -1
             if len(unattempted_starting_locations) == 0:
+                conn.close()
                 return -1
             
             # Return a random unattempted starting location's ID
@@ -134,9 +90,11 @@ class PathController:
                     counter = counter - 1
                     random_location_id = random.randint(0,counter)
                     random_location = sort_unnattempted_list[random_location_id]
+                    conn.close()
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(unattempted_starting_locations)
+                    conn.close()
                     return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
@@ -176,6 +134,7 @@ class PathController:
 
             # If there are no nearby locations of the specified type, return 0
             if len(nearby_locations) == 0:
+                conn.close()
                 return 0
             
             # Return a random nearby location's ID
@@ -188,15 +147,19 @@ class PathController:
                     counter = counter - 1
                     random_location_id = random.randint(0,counter)
                     random_location = sort_nearby_list[random_location_id]
+                    conn.close()
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(nearby_locations)
+                    conn.close()
                     return random_location[0]
             
     def fetch_location_data(self, location_id):
-        cursor = self.conn.cursor()
+        conn = sqlite3.connect('db.sqlite3')
+        cursor = conn.cursor()
         cursor.execute(f"SELECT * FROM myapi_location WHERE id = {location_id}")
         location_data = cursor.fetchone()
+        conn.close()
         return location_data
 
     def favoriteRoute(route):
@@ -253,17 +216,79 @@ class PathController:
             return response.json()
         else:
             return None
+        
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route):
+        # Initialize variables
+        route_ids = []
+        attempted_starting_locations = set()
+        search_radius = PathController.INITIAL_SEARCH_RADIUS
+        last_location = None
+        zip_codes = self.neighborhood_zip_map[neighborhood] if neighborhood is not None else None
 
-# Simple Algorithm Test
+        # Continue until the route includes locations for all location types
+        while len(route_ids) != len(location_types):
+                
+                # Fetch a random location of the current location type
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes)
+
+                # If nearby location is found, add location to route
+                if location_id > 0:
+                    route_ids.append(location_id)
+                    last_location = location_id
+
+                # If no nearby location is found, backtrack to previous location
+                elif location_id == 0:
+                    location_id = route_ids.pop()
+
+                    # If the starting location can not be used for a reasonable route with the current search radius, mark it as attempted
+                    if len(route_ids) == 0:
+                        attempted_starting_locations.add(location_id)
+
+                # If there are no more valid starting locations, broaden the search radius and retry all attempted starting locations
+                else:
+                    search_radius += 1000
+                    attempted_starting_locations.clear()
+
+                    # If search radius exceeds limit, return None
+                    if search_radius > PathController.SEARCH_RADIUS_LIMIT:
+                        route["route"] = None
+
+        # Return the calculated route as a list of locations w/ all information included
+        reasonable_route = []
+        for location_id in route_ids:
+            location_data = self.fetch_location_data(location_id)
+            reasonable_route.append(location_data)
+
+        route["route"] = reasonable_route
     
-location_types=['1','2']
-attributes=[]
-neighborhood = 2
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood):
+        manager = multiprocessing.Manager()
+        route = manager.dict()
 
-path_controller = PathController()
-route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route))
+        p.start()
+        p.join(10)
 
-if route:
-    print(route)
-else:
-    print("route error")
+        #if thread is still alive
+        if p.is_alive():
+            print("kill the thread")
+            p.terminate()
+            p.join()
+            return None
+        else:
+            reasonable_route = route["route"]
+            return reasonable_route
+# Simple Algorithm Test
+
+if __name__ == '__main__':    
+    location_types=['1','2','3','4']
+    attributes=[]
+    neighborhood = 2
+
+    path_controller = PathController()
+    route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)
+
+    if route:
+        print(route)
+    else:
+        print("route error")
