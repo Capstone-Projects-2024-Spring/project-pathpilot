@@ -15,7 +15,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [starsChoice, setStarsChoice] = useState(null);
     const [neighborhoodChoice, setNeighborhoodChoice] = useState(null);
     const [locatedNear, setLocatedNear] = useState(null);
-
+    const [error, setError] = useState(false);
     const [advancedOptions, setAdvancedOptions] = useState(false);
 
     const animatedComponents = makeAnimated();
@@ -105,16 +105,22 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             console.log("Attributes");
             console.log(selectedAttributes);
             setLoading(true);
+            setError(false);
             const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
             //console.log(JSON.parse(pathData.route[0][9]));
-            setLoading(false);
-            console.log(JSON.parse(pathData.route[0][9]));
-            pathData ? setLocations(pathData.route) : console.log("ERROR");
-            pathData ? updateLocations(pathData.route) : console.log("ERROR");
-            pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
-            pathData ? updateAttributeList(selectedAttributes) : console.log("ERROR");
+            if(pathData.hasOwnProperty("error")) {
+                setLoading(false);
+                setError(true);
+            } else {
+                setLoading(false);
+                console.log(JSON.parse(pathData.route[0][9]));
+                pathData ? setLocations(pathData.route) : console.log("ERROR");
+                pathData ? updateLocations(pathData.route) : console.log("ERROR");
+                pathData ? updatePoly(pathData.polyline) : console.log("ERROR");
+                pathData ? updateAttributeList(selectedAttributes) : console.log("ERROR");            
+            }
 
             //pathData.locations ? updateLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? updatePath(pathData.path) : console.log("ERROR");
@@ -141,6 +147,9 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                 )
             }
             </FormGroup>
+
+            {loading ? <div>loading</div> : <div></div>}
+            {error ? <div>error</div> : <div></div>}
 
             {
                 advancedOptions ? 

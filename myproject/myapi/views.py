@@ -61,14 +61,15 @@ def calculate_route(request):
 
         path_controller = PathController()
         route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)
-        polyline = path_controller.calculatePolyline(route)
-
+        print("did it get to here")
         if route:
-            # here is where it should add?
+            # only calculate polyline if no error (route is not None)
+            polyline = path_controller.calculatePolyline(route)
+
             return JsonResponse({'route': route, 'polyline': polyline})
         else:
             # Handle the case where no route could be calculated
-            return JsonResponse({'error': 'Failed to calculate route'}, status=400)
+            return JsonResponse({'error': 'Failed to calculate route'})
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
