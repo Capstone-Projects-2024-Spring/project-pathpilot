@@ -61,6 +61,11 @@ const PlanMapOutput = ({ locations, poly }) => {
                 console.log(markersArray[0]);
                 markersArray[0].map = null;
             }*/
+            if(locations)
+            {
+                const latLong = { lat: locations[0][3], lng: locations[0][4] }
+                map?.panTo(latLong);
+            }
 
             locations?.map((place) => 
             console.log(place[3] + "," + place[4])
