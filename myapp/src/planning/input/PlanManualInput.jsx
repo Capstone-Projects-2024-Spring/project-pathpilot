@@ -69,7 +69,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         { value: 'bsl', label: 'BSL Subway Stop'},
         { value: 'msl', label: 'MSL Subway Stop'},
         { value: 'bus', label: 'Bus Stop'},
-        { value: 'parking', label: 'Parking Garage'},
+        { value: 11, label: 'Parking Garage'},
         { value: 'trolley', label: 'Trolley Stop'},
         { value: 'regional rail', label: 'Regional Rail Station'}
     ];

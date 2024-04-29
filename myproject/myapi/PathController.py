@@ -5,6 +5,8 @@ import json
 from operator import itemgetter
 import multiprocessing
 
+#global transit value, want to ensure we don't skip first value (allows us to redo original fetch)
+transitAdded = False
 class PathController:
 
     # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
@@ -43,20 +45,31 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes):
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type):
         conn = sqlite3.connect('db.sqlite3')
         # Initialize database connection cursor
         cursor = conn.cursor()
 
+        #transit mode, so we don't skip first entry beyond transit
+        #global transitAdded
         # If route is currently empty, select a random starting location
         if last_location is None:
 
             # Fetch all locations of specified location type
-            if zip_codes != None:
+            global transitAdded
+            if zip_codes != None and transit_type!= None and transitAdded == False: #if specific zipcode and transit
+                transitAdded = True
+                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {transit_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
+            elif zip_codes != None: #if specific zipcode
                 cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
+            #global transitAdded
+            elif transit_type != None and transitAdded == False: #if specific transit
+                transitAdded = True
+                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {transit_type}") #select a random parking garage
             else:
                 cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
+
 
             # Filter out starting locations that have been attempted already
             unattempted_starting_locations = [loc for loc in locations if loc[0] not in attempted_starting_locations]
@@ -209,7 +222,6 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "keyhere"
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -217,7 +229,7 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route):
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route, transit_type):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -228,8 +240,12 @@ class PathController:
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
                 
-                # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes)
+                if(transitAdded == True):
+                    # Fetch a random location of the current location type, but route_ids -1 cause transit is in there already
+                    location_id = self.fetch_random_location(location_types[len(route_ids)-1], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
+                else:
+                    # Fetch a random location of the current location type
+                    location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -261,11 +277,11 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood):
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, transitType):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route, transitType))
         p.start()
         p.join(10)
 
