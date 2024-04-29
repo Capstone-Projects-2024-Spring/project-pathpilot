@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -7,6 +7,11 @@ import {TripAttributes} from './TripAttributes.js';
 import FetchPathCalculation from './FetchPathCalculation.js';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+import PulseLoader from 'react-spinners/ClipLoader';
+import Alert from '@mui/material/Alert';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, updateAttributeList }) => {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
@@ -17,6 +22,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [locatedNear, setLocatedNear] = useState(null);
     const [error, setError] = useState(false);
     const [advancedOptions, setAdvancedOptions] = useState(false);
+    const [open, setOpen] = useState(true);
 
     const animatedComponents = makeAnimated();
 
@@ -73,20 +79,25 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             setSelectedTypeLocations(selectedTypeLocations => [...selectedTypeLocations, e.target.value]);
         } else {
             const index = selectedTypeLocations.indexOf(e.target.value);
-            selectedTypeLocations.splice(index,1);
-            //console.log(selectedTypeLocations);
+            setSelectedTypeLocations(selectedTypeLocations => selectedTypeLocations.filter((_,i) => i !== index));
         }
+        console.log(selectedTypeLocations);
     }
 
-    const handleAttributeChange = (e) => {
-        if(e.target.checked) {
-            setSelectedAttributes(selectedAttributes => [...selectedAttributes, e.target.value]);
-        } else {
-            const index = selectedAttributes.indexOf(e.target.value);
-            selectedAttributes.splice(index,1);
-            //console.log(selectedAttributes);
-        }
-    }
+    //Next three useEffects are for testing purposes
+    useEffect(() => {
+        console.log(selectedTypeLocations);
+        console.log(selectedTypeLocations.length)
+    }, [selectedTypeLocations]);
+
+    useEffect(() => {
+        console.log(neighborhoodChoice);
+    }, [neighborhoodChoice]);
+
+    useEffect(() => {
+        console.log(selectedAttributes);
+        console.log(selectedAttributes.length)
+    }, [selectedAttributes]);
 
     const handleAdvanceOptions = () => {
         console.log("Attributes");
@@ -94,6 +105,10 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         if(advancedOptions) {
             setAdvancedOptions(false);
             updateAdvancedOptions(false);
+            setSelectedAttributes([]);
+            setNeighborhoodChoice(null);
+            setCostChoice(null);
+            setLocatedNear(null);
         } else {
             setAdvancedOptions(true);
             updateAdvancedOptions(true);
@@ -113,6 +128,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             if(pathData.hasOwnProperty("error")) {
                 setLoading(false);
                 setError(true);
+                setOpen(true);
+                console.log("error here");
             } else {
                 setLoading(false);
                 console.log(JSON.parse(pathData.route[0][9]));
@@ -148,69 +165,110 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             }
             </FormGroup>
 
-            {loading ? <div>loading</div> : <div></div>}
-            {error ? <div>error</div> : <div></div>}
-
             {
                 advancedOptions ? 
                     <div>
                         <br></br>
                         <div className='advanced-options-title' onClick={handleAdvanceOptions}>Minimize Advanced Options</div>
-                        <h3>Type of trip</h3>
-                        <Select
-                            isMulti
-                            name="colors"
-                            options={TripAttributes}
-                            components={animatedComponents}
-                            onChange={choice => setSelectedAttributes(choice)}
-                            className="basic-multi-select"
-                            classNamePrefix="select"
-                        />
-                        <h3>Cost of Locations</h3>
-                        <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            onChange={choice => choice === null ? setCostChoice(null) : setCostChoice(choice.value)}
-                            options={cost}
-                            isClearable={true}
-                            placeholder="Select Cost..."
-                        />
-            
-                        <h3>Minimum Number of Stars</h3>
-                        <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            onChange={choice => choice === null ? setStarsChoice(null) : setStarsChoice(choice.value)}
-                            options={stars}
-                            isClearable={true}
-                            placeholder="Select Stars..."
-                        />
-            
-                        <h3>Preferred Neighborhood</h3>
-                        <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            onChange={choice => choice === null ? setNeighborhoodChoice(null) : setNeighborhoodChoice(choice.value)}
-                            options={neighborhoods}
-                            isClearable={true}
-                            placeholder="Select Neighborhood..."
-                        />
-            
-                        <h3>Located Near A</h3>
-                        <Select
-                            className="basic-single"
-                            classNamePrefix="select"
-                            isClearable={true}
-                            onChange={choice => choice === null ? setLocatedNear(null) : setLocatedNear(choice.value)}
-                            options={locatedNearLocations}
-                            placeholder="Select Locations..."
-                        />
+                        <h3>Preferred Location Requirements</h3>
+                        <div className='select-container'>
+                            <Select
+                                isMulti
+                                name="colors"
+                                options={TripAttributes}
+                                components={animatedComponents}
+                                onChange={choice => setSelectedAttributes(choice)}
+                                className="basic-multi-select"
+                                classNamePrefix="select"
+                            />
+                        </div>
+                        <div className='select-container'>
+                            <h3>Cost of Locations</h3>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                onChange={choice => choice === null ? setCostChoice(null) : setCostChoice(choice.value)}
+                                options={cost}
+                                isClearable={true}
+                                placeholder="Select Cost..."
+                            />
+                        </div>
+                        <div className='select-container'>
+                            <h3>Minimum Number of Stars</h3>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                onChange={choice => choice === null ? setStarsChoice(null) : setStarsChoice(choice.value)}
+                                options={stars}
+                                isClearable={true}
+                                placeholder="Select Stars..."
+                            />
+                        </div>
+                        <div className='select-container'>
+                            <h3>Preferred Neighborhood</h3>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                onChange={choice => choice === null ? setNeighborhoodChoice(null) : setNeighborhoodChoice(choice.value)}
+                                options={neighborhoods}
+                                isClearable={true}
+                                placeholder="Select Neighborhood..."
+                            />
+                        </div>
+                        <div className='select-container'>
+                            <h3>Located Near A</h3>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                isClearable={true}
+                                onChange={choice => choice === null ? setLocatedNear(null) : setLocatedNear(choice.value)}
+                                options={locatedNearLocations}
+                                placeholder="Select Locations..."
+                            />
+                        </div>
                     </div>
                 : <div className='advanced-options-title' onClick={handleAdvanceOptions}>Advanced Options</div>
             }
             <br></br>
+
+            {loading ?
+                <div className='loading-container'>
+                    <div className='loading-text'>Loading</div>
+                    <PulseLoader
+                        color="#36d7b7"
+                        speedMultiplier={0.5}
+                        loading={loading}
+                    />
+                </div> : <div></div>
+            }
+            {error ?  
+                <div className='error-container'>
+                    <Collapse in={open}>
+                        <Alert
+                        action={
+                            <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setOpen(false);
+                            }}
+                            >
+                            <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                        }
+                        severity='error'
+                        sx={{ mb: 2 }}
+                        >
+                        Error occurred, please try again with a different set of trip requirements
+                        </Alert>
+                    </Collapse>
+                </div>: <div></div>}
+            
+            {selectedTypeLocations.length > 10 ? <div className='too-long-conatiner'><Alert severity='warning'>Can only choose max 10 location types</Alert></div> : <div></div>}
+
             <div className='submit-button-container'>
-                <button disabled={loading || selectedTypeLocations.length === 0} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
+                <button disabled={loading || selectedTypeLocations.length === 0 || selectedTypeLocations.length > 10} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
             </div>
         </div>
     )

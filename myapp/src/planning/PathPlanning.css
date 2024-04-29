@@ -80,7 +80,6 @@ body {
     min-width: 150px;
     border-radius: 4px;
     display: block;
-    margin: 0 1rem; /* Add space between buttons */
 }
 
 .submit-button:hover:enabled {
@@ -202,9 +201,9 @@ body {
     transition: all 0.3s ease-out;
     width: 35px;
     background-color: red;
-  }
+}
   
-  .place-marker::after {
+.place-marker::after {
     border-left: 9px solid transparent;
     border-right: 9px solid transparent;
     content: "";
@@ -217,16 +216,40 @@ body {
     width: 0;
     z-index: 1;
     border-top: 9px solid red;
-  }
+}
   
-  .place-marker .place {
+.place-marker .place {
     align-items: center;
     display: flex;
     justify-content: center;
     color: #FFFFFF;
     height: 20px;
-  }
+}
 
-  .we-want-bold {
+.we-want-bold {
     font-weight: bold;
-  }
+}
+
+.loading-container {
+    display: flex;
+    padding-bottom: 1rem;
+}
+
+.loading-text {
+    padding-right: 1rem;
+    font-weight: bold;
+}
+
+.error-container {
+    padding-bottom: 1rem;
+    width: 75%;
+}
+
+.too-long-conatiner {
+    padding-bottom: 1rem;
+    width: 75%;
+}
+
+.select-container {
+    padding-bottom: 1rem;
+}
