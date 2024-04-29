@@ -3,14 +3,13 @@ import { Rating } from '@mui/material';
 import { LocationTypes } from '../input/LocationTypes.js';
 import { AddSavedTrip } from './AddSavedTrip.js';
 
-const user_id = localStorage.getItem("id")
-
+const user_id = localStorage.getItem("id");
 const PlanListOutput = ({ locations, updateLocations, updateAdvancedOptions, attributeList, updateAttributeList }) => {
     const locationsList = [
         "place1","place2","place3"
     ];
     var count = 1;
-
+    const user_id = localStorage.getItem("id");
 
     const ReturnToInput = () => {
         updateLocations(null);
@@ -33,11 +32,10 @@ const SaveRouteToAccount = async () => {
                 <div className='start-again-button-container'>
                     <button className='submit-button' onClick={ReturnToInput}>Start Over</button>
                 </div>
+                {user_id ? 
                 <div className='start-again-button-container'>
-                    {user_id && (
                     <button className='submit-button' onClick={SaveRouteToAccount}>Save Route</button>
-                    )}
-                </div>
+                </div> : <div></div>}
             </div>
 
             {
