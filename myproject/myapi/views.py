@@ -59,7 +59,13 @@ def calculate_route(request):
         attributes = request.data.get('attributesToSend')
         neighborhood = request.data.get('neighborhood')
         transitType = request.data.get('locatedNear')
-
+        if(transitType!=None): #put it in there!
+            if(transitType==11): #parking garage, add to beginning
+                location_types.insert(0, transitType)
+            if(transitType==13 or transitType == 15): #13 = subways; 14 = regional rail
+                location_types.insert(0, transitType) #add to the beginning
+                location_types.append(transitType) #add to the end, not guaranteed or neccessary to be the same station, just one close
+        
         path_controller = PathController()
         route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, transitType)
         print("did it get to here")

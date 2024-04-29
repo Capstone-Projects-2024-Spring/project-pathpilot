@@ -6,7 +6,6 @@ from operator import itemgetter
 import multiprocessing
 
 #global transit value, want to ensure we don't skip first value (allows us to redo original fetch)
-transitAdded = False
 class PathController:
 
     # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
@@ -55,17 +54,9 @@ class PathController:
         # If route is currently empty, select a random starting location
         if last_location is None:
 
-            # Fetch all locations of specified location type
-            global transitAdded
-            if zip_codes != None and transit_type!= None and transitAdded == False: #if specific zipcode and transit
-                transitAdded = True
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {transit_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
-            elif zip_codes != None: #if specific zipcode
+            if zip_codes != None: #if specific zipcode
                 cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
-            #global transitAdded
-            elif transit_type != None and transitAdded == False: #if specific transit
-                transitAdded = True
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {transit_type}") #select a random parking garage
+            
             else:
                 cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
@@ -240,12 +231,8 @@ class PathController:
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
                 
-                if(transitAdded == True):
-                    # Fetch a random location of the current location type, but route_ids -1 cause transit is in there already
-                    location_id = self.fetch_random_location(location_types[len(route_ids)-1], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
-                else:
-                    # Fetch a random location of the current location type
-                    location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
+                # Fetch a random location of the current location type
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
