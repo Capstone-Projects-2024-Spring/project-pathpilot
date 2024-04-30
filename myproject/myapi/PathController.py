@@ -96,12 +96,14 @@ class PathController:
                     random_location_id = random.randint(0,counter)
                     random_location = sort_unnattempted_list[random_location_id]
                     conn.close()
-                    crawl_locations.append(random_location[0])
+
+                    crawl_locations.append(random_location[0]) #add location to crawl list
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(unattempted_starting_locations)
                     conn.close()
-                    crawl_locations.append(random_location[0])
+
+                    crawl_locations.append(random_location[0]) #add location to crawl list
                     return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
@@ -125,13 +127,13 @@ class PathController:
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
 
-            #global crawl_locations
+            #add the last added to location to our list of crawl options used
             crawl_locations.append(last_location)
             #print(crawl_locations)
             #print("Nearby locations")
             #print(nearby_locations)
             for i in nearby_locations: #avoid repeats for crawl option
-                print("This is what i is: " + str(i))
+                #if this location has already been added, remove it from our list of options
                 if(i[0] in crawl_locations):
                     print("should be removing")
                     #print(i)
@@ -255,7 +257,7 @@ class PathController:
                 if location_id > 0:
                     route_ids.append(location_id)
                     last_location = location_id
-
+                 
                 # If no nearby location is found, backtrack to previous location
                 elif location_id == 0:
                     location_id = route_ids.pop()
