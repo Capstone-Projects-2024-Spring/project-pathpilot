@@ -12,23 +12,26 @@ class PathController:
     # Bella Vista / Queens Village / Pennsport
     1: ["19147"],
     
-    # Fishtown / Callowhill / Northern Liberties
-    2: ["19125", "19123"],
+    # Northern Liberties / Callowhill
+    2: ["19123"],
+
+    # Fishtown
+    3: ["19125"],
     
     # Fairmount / Spring Garden
-    3: ["19130"],
+    4: ["19130"],
     
     # Rittenhouse Square / Logan Square
-    4: ["19102", "19103", "19146"],
+    5: ["19102", "19103", "19146"],
     
     # Chinatown / Old City
-    5: ["19107", "19106"],
-    
-    # North Broad
-    6: ["19121", "19132"],
+    6: ["19107", "19106"],
     
     # Spruce Hill / Cedar Park / Point Breeze
-    7: ["19104", "19146"]
+    7: ["19104", "19146"],
+
+    # North Broad
+    8: ["19121", "19132"],
     }
 
     # Measured In Feet
