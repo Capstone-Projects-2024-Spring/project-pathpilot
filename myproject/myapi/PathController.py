@@ -49,7 +49,7 @@ class PathController:
         conn = sqlite3.connect('db.sqlite3')
         # Initialize database connection cursor
         cursor = conn.cursor()
-
+        global crawl_locations
         #transit mode, so we don't skip first entry beyond transit
         #global transitAdded
         # If route is currently empty, select a random starting location
@@ -96,10 +96,12 @@ class PathController:
                     random_location_id = random.randint(0,counter)
                     random_location = sort_unnattempted_list[random_location_id]
                     conn.close()
+                    crawl_locations.append(random_location[0])
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(unattempted_starting_locations)
                     conn.close()
+                    crawl_locations.append(random_location[0])
                     return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
@@ -123,7 +125,7 @@ class PathController:
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
 
-            global crawl_locations
+            #global crawl_locations
             crawl_locations.append(last_location)
             #print(crawl_locations)
             #print("Nearby locations")
