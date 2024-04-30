@@ -58,9 +58,10 @@ def calculate_route(request):
         location_types = request.data.get('locationTypes')
         attributes = request.data.get('attributesToSend')
         neighborhood = request.data.get('neighborhood')
+        cost = request.data.get("cost")
 
         path_controller = PathController()
-        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood)
+        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, cost)
         print("did it get to here")
         if route:
             # only calculate polyline if no error (route is not None)

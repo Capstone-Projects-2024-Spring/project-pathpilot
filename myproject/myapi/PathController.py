@@ -43,16 +43,16 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes):
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost):
         # Initialize database connection cursor
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
 
-        where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes)
+        where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes, cost)
 
         # If route is currently empty, select a random starting location
         if last_location is None:
-            cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}", zip_codes)
+            cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
             locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
@@ -96,7 +96,7 @@ class PathController:
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
         else:
-            cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}", zip_codes)
+            cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
 
@@ -136,7 +136,7 @@ class PathController:
                     conn.close()
                     return random_location[0]
 
-    def get_where_clause(self, location_type, last_location, search_radius, zip_codes):
+    def get_where_clause(self, location_type, last_location, search_radius, zip_codes, cost):
         where_clause = f"WHERE location_type_id = {location_type}"
 
         if last_location is not None:
@@ -158,9 +158,14 @@ class PathController:
             where_clause += nearby_location_clause
 
         if zip_codes is not None:
-            zip_codes_clause = f" AND zip_code IN ({','.join(['?']*len(zip_codes))})"
-            where_clause += zip_codes_clause
-        
+            zip_codes_str = ','.join([f"'{zip_code}'" for zip_code in zip_codes])
+            zip_code_clause = f" AND zip_code IN ({zip_codes_str})"
+            where_clause += zip_code_clause
+
+        if cost is not None:
+            cost_clause = f" AND cost = '{cost} '"
+            where_clause += cost_clause
+
         return where_clause
 
     def fetch_location_data(self, location_id):
@@ -218,7 +223,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "keyHere"
+                "X-Goog-Api-Key": "AIzaSyDAn2xcP0vXpMmi6VkKMs5X3YQyttH2CqQ"
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -226,7 +231,7 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route):
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, cost, route):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -238,7 +243,7 @@ class PathController:
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes)
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -270,11 +275,11 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood):
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, cost):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,cost,route))
         p.start()
         p.join(10)
 
