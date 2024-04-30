@@ -66,9 +66,10 @@ def calculate_route(request):
             print("made it in here")
             i=0
             choice = location_types[0]
-            while (i<crawlSize):
-                location_types.append(choice) #repeat it on list
+            while (i<crawlSize-1):
                 i+=1
+                location_types.append(choice) #repeat it on list
+                
         
         #accomodate for chosen transit method
         if(transitType!=None): #put it in there!

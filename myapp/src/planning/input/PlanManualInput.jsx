@@ -49,13 +49,13 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     ];
 
     const crawls = [
-        { value: 1, label: '2 Spots' },
-        { value: 2, label: '3 Spots' },
-        { value: 3, label: '4 Spots' },
-        { value: 4, label: '5 Spots' },
-        { value: 5, label: '6 Spots' },
-        { value: 6, label: '8 Spots' },
-        { value: 7, label: '10 Spots' }
+        { value: 2, label: '2 Spots' },
+        { value: 3, label: '3 Spots' },
+        { value: 4, label: '4 Spots' },
+        { value: 5, label: '5 Spots' },
+        { value: 6, label: '6 Spots' },
+        { value: 8, label: '8 Spots' },
+        { value: 10, label: '10 Spots' }
     ];
 
     // Ensure this is in sync with zip_code_mapping in PathController.py
@@ -238,7 +238,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                             />
                         </div>
                         <div className='select-container'>
-                            <h3>Bar Crawl Mode</h3>
+                            <h3>Crawl Mode</h3>
                             <Select
                                 className="basic-single"
                                 classNamePrefix="select"
