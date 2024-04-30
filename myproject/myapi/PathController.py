@@ -5,7 +5,8 @@ import json
 from operator import itemgetter
 import multiprocessing
 
-#global transit value, want to ensure we don't skip first value (allows us to redo original fetch)
+crawl_locations = []
+
 class PathController:
 
     # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
@@ -121,6 +122,20 @@ class PathController:
                 cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
+
+            global crawl_locations
+            crawl_locations.append(last_location)
+            #print(crawl_locations)
+            #print("Nearby locations")
+            #print(nearby_locations)
+            for i in nearby_locations: #avoid repeats for crawl option
+                print("This is what i is: " + str(i))
+                if(i[0] in crawl_locations):
+                    print("should be removing")
+                    #print(i)
+                    nearby_locations.remove(i)
+                    #print(nearby_locations)
+
 
             if len(attributes) > 0:
                 for loc in nearby_locations:
