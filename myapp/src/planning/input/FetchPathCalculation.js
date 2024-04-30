@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { fetchPathURL } from '../../api/apiConfig';
 
-const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neighborhood, locatedNear) => {
+const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neighborhood, locatedNear, crawlChoice) => {
    try {
         console.log(attributes);
         const attributesToSend = attributes.map(attribute => attribute.value)
@@ -9,7 +9,8 @@ const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neig
             locationTypes,
             attributesToSend,
             neighborhood,
-            locatedNear
+            locatedNear,
+            crawlChoice
         });
         console.log(response.data);
         console.log(response.data.polyline);
