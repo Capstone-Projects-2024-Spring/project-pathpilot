@@ -43,12 +43,12 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost):
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost, stars):
         # Initialize database connection cursor
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
 
-        where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes, cost)
+        where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes, cost, stars)
 
         # If route is currently empty, select a random starting location
         if last_location is None:
@@ -136,7 +136,7 @@ class PathController:
                     conn.close()
                     return random_location[0]
 
-    def get_where_clause(self, location_type, last_location, search_radius, zip_codes, cost):
+    def get_where_clause(self, location_type, last_location, search_radius, zip_codes, cost, stars):
         where_clause = f"WHERE location_type_id = {location_type}"
 
         if last_location is not None:
@@ -165,6 +165,10 @@ class PathController:
         if cost is not None:
             cost_clause = f" AND cost = '{cost} '"
             where_clause += cost_clause
+
+        if stars is not None:
+            stars_clause = f" AND average_star_rating >= {stars}"
+            where_clause += stars_clause
 
         return where_clause
 
@@ -223,7 +227,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "AIzaSyDAn2xcP0vXpMmi6VkKMs5X3YQyttH2CqQ"
+                "X-Goog-Api-Key": "keyHere"
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -231,7 +235,7 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, cost, route):
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, cost, stars, route):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -243,7 +247,7 @@ class PathController:
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost)
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost, stars)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -275,11 +279,11 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood, cost):
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, cost, stars):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,cost,route))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,cost,stars,route))
         p.start()
         p.join(10)
 
