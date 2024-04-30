@@ -4,6 +4,7 @@ import requests
 import json
 from operator import itemgetter
 import multiprocessing
+import time
 
 class PathController:
 
@@ -43,27 +44,17 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes):
-        conn = sqlite3.connect('db.sqlite3')
-        # Initialize database connection cursor
-        cursor = conn.cursor()
+    def fetch_random_location(self, location_type, attempted_starting_locations, locations, search_radius, last_location, attributes, zip_codes):
 
         # If route is currently empty, select a random starting location
         if last_location is None:
-
-            # Fetch all locations of specified location type
-            if zip_codes != None:
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
-            else:
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
-            locations = cursor.fetchall()
 
             # Filter out starting locations that have been attempted already
             unattempted_starting_locations = [loc for loc in locations if loc[0] not in attempted_starting_locations]
             
             # IF there are no more unattempted starting_locations, return -1
             if len(unattempted_starting_locations) == 0:
-                conn.close()
+                #print(attempted_starting_locations)
                 return -1
             
             # Return a random unattempted starting location's ID
@@ -90,15 +81,16 @@ class PathController:
                     counter = counter - 1
                     random_location_id = random.randint(0,counter)
                     random_location = sort_unnattempted_list[random_location_id]
-                    conn.close()
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(unattempted_starting_locations)
-                    conn.close()
                     return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
         else:
+            conn = sqlite3.connect('db.sqlite3')
+            # Initialize database connection cursor
+            cursor = conn.cursor()
 
             # Fetch the location and latitude of the previous location
             cursor.execute(f"SELECT latitude, longitude FROM myapi_location WHERE id = {last_location}")
@@ -217,24 +209,24 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route):
+    def calculateReasonableRouteFunc(self, location_types, locations, attributes, zip_codes, route):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
         search_radius = PathController.INITIAL_SEARCH_RADIUS
         last_location = None
-        zip_codes = self.neighborhood_zip_map[neighborhood] if neighborhood is not None else None
 
         # Continue until the route includes locations for all location types
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes)
-
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, locations, search_radius, last_location, attributes, zip_codes)
                 # If nearby location is found, add location to route
                 if location_id > 0:
                     route_ids.append(location_id)
                     last_location = location_id
+                    #print("location id")
+                    #print(location_id)
 
                 # If no nearby location is found, backtrack to previous location
                 elif location_id == 0:
@@ -246,42 +238,104 @@ class PathController:
 
                 # If there are no more valid starting locations, broaden the search radius and retry all attempted starting locations
                 else:
-                    search_radius += 1000
+                    #print(locations)
+                    search_radius += 500
                     attempted_starting_locations.clear()
 
                     # If search radius exceeds limit, return None
                     if search_radius > PathController.SEARCH_RADIUS_LIMIT:
+                        #print("returning none")
                         route["route"] = None
+                        return
 
         # Return the calculated route as a list of locations w/ all information included
         reasonable_route = []
         for location_id in route_ids:
             location_data = self.fetch_location_data(location_id)
             reasonable_route.append(location_data)
-
+        #print(reasonable_route)
         route["route"] = reasonable_route
+        return
     
     def calculateReasonableRoute(self, location_types, attributes, neighborhood):
+        conn = sqlite3.connect('db.sqlite3')
+        # Initialize database connection cursor
+        cursor = conn.cursor()
+        zip_codes = self.neighborhood_zip_map[neighborhood] if neighborhood is not None else None
+
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route))
-        p.start()
-        p.join(10)
+        # Fetch all locations of specified location type
+        if zip_codes != None:
+            cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_types[0]} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
+        else:
+            cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_types[0]}")
+        locations = cursor.fetchall()
+        #print("all locations")
+        #print(locations)
 
-        #if thread is still alive
-        if p.is_alive():
-            print("kill the thread")
+        #if no locations returned, don't continue
+        if len(locations) == 0:
+            return None
+
+        processes = []
+        listEndHit = False
+        i = 0
+        lastIndex = 0
+        while not listEndHit:
+            if (lastIndex + int(len(locations) / 4)) >= len(locations):
+                #location_segments[i] = locations[(i * 4):]
+                #print("list end")
+                #print(locations[(lastIndex):])
+                p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,locations[lastIndex:],attributes,zip_codes, route))
+                processes.append(p)
+                listEndHit = True
+            else:
+                #print("in list")
+                #print(locations[lastIndex:lastIndex + int(len(locations) / 4)])
+                #location_segments[i] = locations[(i * 4):(i * 4 + 4)]
+                p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,locations[lastIndex:(lastIndex + int(len(locations) / 4))],attributes,zip_codes, route))
+                processes.append(p)
+                lastIndex = lastIndex + int(len(locations) / 4)
+        conn.close()
+
+        for p in processes:
+            p.start()
+        
+        TIMEOUT = 10
+        start = time.time()
+        while time.time() - start <= TIMEOUT:
+            #if any of the processes have stopped, kill the ones still running
+            if any([not p.is_alive() for p in processes]) and route["route"] is not None:
+                reasonable_route = route["route"]
+                #print("in here")
+                for p in processes:
+                    if p.is_alive():
+                        p.terminate()
+                    p.join()
+                return reasonable_route
+            #if all the processes have stopped and no route has been found, return None
+            if all([not p.is_alive() for p in processes]):
+                #print("how about in here")
+                for p in processes:
+                    p.join()
+                if "route" in route:
+                    return route["route"]
+                else:
+                    return None
+            time.sleep(.1)  # Don't hog the CPU
+        
+        # If the program gets stuck, tell user to run again by returning None
+        print("timed out, killing all processes")
+        for p in processes:
             p.terminate()
             p.join()
-            return None
-        else:
-            reasonable_route = route["route"]
-            return reasonable_route
+        return None
 # Simple Algorithm Test
 
 if __name__ == '__main__':    
-    location_types=['1','2','3','4']
+    location_types=['1','2']
     attributes=[]
     neighborhood = 2
 
