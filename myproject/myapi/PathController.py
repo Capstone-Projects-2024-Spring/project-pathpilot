@@ -39,7 +39,7 @@ class PathController:
 
     # Measured In Feet
     INITIAL_SEARCH_RADIUS = 2000
-    SEARCH_RADIUS_LIMIT = 5000
+    SEARCH_RADIUS_LIMIT = 4000
 
     FEET_PER_DEGREE_LAT = 364000
     FEET_PER_DEGREE_LON = 288200
@@ -270,7 +270,7 @@ class PathController:
                 # If there are no more valid starting locations, broaden the search radius and retry all attempted starting locations
                 else:
                     #print(locations)
-                    search_radius += 500
+                    search_radius += 1000
                     attempted_starting_locations.clear()
 
                     # If search radius exceeds limit, return None
