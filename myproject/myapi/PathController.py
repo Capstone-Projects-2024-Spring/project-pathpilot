@@ -45,7 +45,7 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type):
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, transit_type):
         conn = sqlite3.connect('db.sqlite3')
         # Initialize database connection cursor
         cursor = conn.cursor()
@@ -97,13 +97,16 @@ class PathController:
                     random_location = sort_unnattempted_list[random_location_id]
                     conn.close()
 
-                    crawl_locations.append(random_location[0]) #add location to crawl list
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location[0]) #add location to crawl list
+                    
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(unattempted_starting_locations)
                     conn.close()
 
-                    crawl_locations.append(random_location[0]) #add location to crawl list
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location[0]) #add location to crawl list
                     return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
@@ -240,7 +243,7 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route, transit_type):
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route, crawlNum, transit_type):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -252,7 +255,7 @@ class PathController:
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, transit_type)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -284,11 +287,11 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood, transitType):
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, crawlSize, transitType):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route, transitType))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route, crawlSize, transitType))
         p.start()
         p.join(10)
 
