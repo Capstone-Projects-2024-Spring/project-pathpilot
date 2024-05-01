@@ -24,6 +24,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [error, setError] = useState(false);
     const [advancedOptions, setAdvancedOptions] = useState(false);
     const [open, setOpen] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const animatedComponents = makeAnimated();
 
@@ -139,6 +140,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             if(pathData.hasOwnProperty("error")) {
                 setLoading(false);
                 setError(true);
+                setErrorMessage(pathData.error);
                 setOpen(true);
                 console.log("error here");
             } else {
@@ -282,7 +284,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                         severity='error'
                         sx={{ mb: 2 }}
                         >
-                        Error occurred, please try again with a different set of trip requirements
+                        Error! {errorMessage}
                         </Alert>
                     </Collapse>
                 </div>: <div></div>}
