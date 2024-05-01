@@ -133,7 +133,7 @@ class PathController:
             #add the last added to location to our list of crawl options used
             
             if(crawlNum != None): #only edit crawl list if we want to crawl
-                crawl_locations.append(random_location[0]) #add location to crawl list
+                crawl_locations.append(last_location) #add location to crawl list
                 #print(crawl_locations)
                 #print("Nearby locations")
                 #print(nearby_locations)
