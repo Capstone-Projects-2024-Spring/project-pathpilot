@@ -1,11 +1,13 @@
 import axios from 'axios';
+import { getAISuggestion } from '../../api/apiConfig';
 
-/*
+
 const FetchAIResponse = async (userInput) => {
     try {
-        const response = await axios.post('https://example.com/api/ai-response', {
-            userInput
-        });
+        console.log("user input");
+        console.log(userInput);
+        const response = await axios.get(`${getAISuggestion}?userInput=${userInput}`);
+        console.log(response)
 
         return response.data;
     } catch (error) {
@@ -13,6 +15,5 @@ const FetchAIResponse = async (userInput) => {
         throw error;
     }
 };
-*/
 
 export default FetchAIResponse;
