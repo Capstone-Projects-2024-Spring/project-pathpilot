@@ -73,14 +73,12 @@ const PlanAIInput = ({updateModalState, modalOpen, updateLocations, updateAdvanc
 ];
 
     const locatedNearLocations = [
-        { value: 'bsl', label: 'BSL Subway Stop'},
-        { value: 'msl', label: 'MSL Subway Stop'},
+        { value: 13, label: 'BSL or MFL Subway Stop'},
         { value: 'bus', label: 'Bus Stop'},
-        { value: 'parking', label: 'Parking Garage'},
+        { value: 11, label: 'Parking Garage'},
         { value: 'trolley', label: 'Trolley Stop'},
         { value: 'regional rail', label: 'Regional Rail Station'}
     ];
-
     const handleAdvanceOptions = () => {
         console.log("Attributes");
         console.log(selectedAttributes);

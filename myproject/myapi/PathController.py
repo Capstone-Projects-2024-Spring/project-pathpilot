@@ -7,6 +7,7 @@ import multiprocessing
 import time
 from math import ceil
 
+#global transit value, want to ensure we don't skip first value (allows us to redo original fetch)
 class PathController:
 
     # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
@@ -54,6 +55,7 @@ class PathController:
 
         # If route is currently empty, select a random starting location
         if last_location is None:
+
 
             # Filter out starting locations that have been attempted already
             unattempted_starting_locations = [loc for loc in locations if loc[0] not in attempted_starting_locations]
@@ -228,7 +230,8 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "keyHere"
+                "X-Goog-Api-Key": "keyhere"
+
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -248,6 +251,7 @@ class PathController:
                 
                 # Fetch a random location of the current location type
                 location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, locations, search_radius, last_location, attributes, zip_codes, cost, stars)
+
                 # If nearby location is found, add location to route
                 if location_id > 0:
                     route_ids.append(location_id)
@@ -299,7 +303,7 @@ class PathController:
         cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
         locations = cursor.fetchall()
         #print("all locations")
-        print(locations)
+        #print(locations)
 
         #if no locations returned, don't continue
         if len(locations) == 0:
@@ -312,15 +316,15 @@ class PathController:
             if (lastIndex + ceil(len(locations) / 4)) >= len(locations):
                 #location_segments[i] = locations[(i * 4):]
                 #print("list end")
-                print(locations[(lastIndex):])
+                #print(locations[(lastIndex):])                                                                 
                 p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,locations[lastIndex:],attributes,zip_codes, cost, stars, route))
                 processes.append(p)
-                print('last')
-                print(locations[lastIndex:])
+                #print('last')
+                #print(locations[lastIndex:])
                 listEndHit = True
             else:
                 #print("in list")
-                print(locations[lastIndex:lastIndex + ceil(len(locations) / 4)])
+                #print(locations[lastIndex:lastIndex + ceil(len(locations) / 4)])
                 #location_segments[i] = locations[(i * 4):(i * 4 + 4)]
                 p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,locations[lastIndex:(lastIndex + ceil(len(locations) / 4))],attributes,zip_codes, cost, stars, route))
                 processes.append(p)
@@ -338,7 +342,7 @@ class PathController:
             #if any of the processes have stopped, kill the ones still running
             if any([not p.is_alive() for p in processes]) and route["route"] is not None:
                 reasonable_route = route["route"]
-                print("in here")
+                #print("in here")
                 for p in processes:
                     if p.is_alive():
                         p.terminate()
@@ -346,7 +350,7 @@ class PathController:
                 return reasonable_route
             #if all the processes have stopped and no route has been found, return None
             if all([not p.is_alive() for p in processes]):
-                print("how about in here")
+                #print("how about in here")
                 for p in processes:
                     p.join()
                 if "route" in route:

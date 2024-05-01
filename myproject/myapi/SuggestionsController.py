@@ -28,7 +28,7 @@ class SuggestionsController:
         print(total_prompt)
 
         #Get cohere response
-        co = cohere.Client("keyHere")
+        co = cohere.Client("keyhere")
 
         response = co.generate(
             prompt= total_prompt,

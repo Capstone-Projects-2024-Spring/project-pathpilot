@@ -55,7 +55,7 @@ const SaveRouteToAccount = async () => {
                             </div>
                         </div>
                         <div className="place-name">{place[1]}</div>
-                        <div className="place-address">{place[5]}</div>
+                        <div className="place-address">{place[5] !== "-1" ? <div className='we-want-bold'>Cost: {place[5]}</div> : <div></div>}</div>
                         <br></br>
                         <div className="place-cost">{place[10] !== "-1" ? <div className='we-want-bold'>Cost: {place[10]}</div> : <div></div>}</div>
                         <div className="rating">
