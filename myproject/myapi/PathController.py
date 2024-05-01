@@ -5,6 +5,7 @@ import json
 from operator import itemgetter
 import multiprocessing
 
+#global transit value, want to ensure we don't skip first value (allows us to redo original fetch)
 class PathController:
 
     # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
@@ -46,17 +47,23 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost, stars):
+
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type, cost, stars):
+        conn = sqlite3.connect('db.sqlite3')
+
         # Initialize database connection cursor
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
+
 
         where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes, cost, stars)
 
         # If route is currently empty, select a random starting location
         if last_location is None:
             cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
+
             locations = cursor.fetchall()
+
 
             # Filter out starting locations that have been attempted already
             unattempted_starting_locations = [loc for loc in locations if loc[0] not in attempted_starting_locations]
@@ -230,7 +237,8 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "keyHere"
+                "X-Goog-Api-Key": "keyhere"
+
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -238,7 +246,9 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, cost, stars, route):
+
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, transit_type, cost, stars, route):
+
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -250,7 +260,9 @@ class PathController:
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost, stars)
+
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type, cost, stars)
+
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -282,11 +294,13 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood, cost, stars):
+
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, transitType, cost, stars):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,cost,stars,route))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood, transitType, cost, stars, route))
+
         p.start()
         p.join(10)
 
