@@ -49,27 +49,28 @@ const PlanAIInput = ({updateModalState, modalOpen, updateLocations, updateAdvanc
         { value: 1, label: '1 Star' },
         { value: 2, label: '2 Stars' },
         { value: 3, label: '3 Stars' },
-        { value: 4, label: '4 Stars' },
-        { value: 5, label: '5 Stars' }
+        { value: 4, label: '4 Stars' }
     ];
 
-    // Ensure this is in sync with zip_code_mapping in PathController.py
-    const neighborhoods = [
-        { value: 1, label: 'Bella Vista / Queens Village / Pennsport' },
-        // 19147
-        { value: 2, label: 'Fishtown / Callowhill / Northern Liberties' },
-        // 19125, 19123
-        { value: 3, label: 'Fairmount / Spring Garden' },
-        // 19130
-        { value: 4, label: 'Rittenhouse Square / Logan Square' },
-        // 19102, 19103, 19146
-        { value: 5, label: 'Chinatown / Old City' },
-        // 19107, 19106
-        { value: 6, label: 'North Broad' },
-        // 19121, 19132
-        { value: 7, label: 'Spruce Hill / Cedar Park / Point Breeze' },
-        // 19104, 19146
-    ];
+   // Ensure this is in sync with zip_code_mapping in PathController.py
+   const neighborhoods = [
+    { value: 1, label: 'Bella Vista / Queens Village / Pennsport' },
+    // 19147
+    { value: 2, label: 'Northern Liberties / Callowhill' },
+    // 19123
+    { value: 3, label: 'Fishtown' },
+    // 19125
+    { value: 4, label: 'Fairmount / Spring Garden' },
+    // 19130
+    { value: 5, label: 'Rittenhouse Square / Logan Square' },
+    // 19102, 19103, 19146
+    { value: 6, label: 'Chinatown / Old City' },
+    // 19107, 19106
+    { value: 7, label: 'Spruce Hill / Cedar Park / Point Breeze' },
+    // 19104, 19146
+    { value: 8, label: 'North Broad' },
+    // 19121, 19132
+];
 
     const locatedNearLocations = [
         { value: 'bsl', label: 'BSL Subway Stop'},
