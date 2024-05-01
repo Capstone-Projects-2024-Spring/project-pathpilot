@@ -9,7 +9,9 @@ const FetchPathCalculation = async (locationTypes, attributes, cost, stars, neig
             locationTypes,
             attributesToSend,
             neighborhood,
-            locatedNear
+            locatedNear,
+            cost,
+            stars
         });
         console.log(response.data);
         console.log(response.data.polyline);

@@ -13,23 +13,26 @@ class PathController:
     # Bella Vista / Queens Village / Pennsport
     1: ["19147"],
     
-    # Fishtown / Callowhill / Northern Liberties
-    2: ["19125", "19123"],
+    # Northern Liberties / Callowhill
+    2: ["19123"],
+
+    # Fishtown
+    3: ["19125"],
     
     # Fairmount / Spring Garden
-    3: ["19130"],
+    4: ["19130"],
     
     # Rittenhouse Square / Logan Square
-    4: ["19102", "19103", "19146"],
+    5: ["19102", "19103", "19146"],
     
     # Chinatown / Old City
-    5: ["19107", "19106"],
-    
-    # North Broad
-    6: ["19121", "19132"],
+    6: ["19107", "19106"],
     
     # Spruce Hill / Cedar Park / Point Breeze
-    7: ["19104", "19146"]
+    7: ["19104", "19146"],
+
+    # North Broad
+    8: ["19121", "19132"],
     }
 
     # Measured In Feet
@@ -44,21 +47,21 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type):
+
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type, cost, stars):
         conn = sqlite3.connect('db.sqlite3')
+
         # Initialize database connection cursor
+        conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
 
-        #transit mode, so we don't skip first entry beyond transit
-        #global transitAdded
+
+        where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes, cost, stars)
+
         # If route is currently empty, select a random starting location
         if last_location is None:
+            cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
 
-            if zip_codes != None: #if specific zipcode
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))})", zip_codes)
-            
-            else:
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type}")
             locations = cursor.fetchall()
 
 
@@ -103,22 +106,7 @@ class PathController:
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
         else:
-
-            # Fetch the location and latitude of the previous location
-            cursor.execute(f"SELECT latitude, longitude FROM myapi_location WHERE id = {last_location}")
-            previous_location = cursor.fetchone()
-            previous_lat = previous_location[0]
-            previous_lon = previous_location[1]
-
-            # Calculate latitude and longitude ranges within the search radius
-            lat_range = search_radius / PathController.FEET_PER_DEGREE_LAT
-            lon_range = search_radius / PathController.FEET_PER_DEGREE_LON
-
-            # Fetch nearby locations within the latitude and longitude ranges
-            if zip_codes != None:
-                cursor.execute(f"SELECT id, attributes FROM myapi_location WHERE location_type_id = {location_type} AND zip_code IN ({','.join(['?']*len(zip_codes))}) AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})", zip_codes)
-            else:
-                cursor.execute(f"SELECT id,attributes FROM myapi_location WHERE location_type_id = {location_type} AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})")
+            cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
 
@@ -157,7 +145,43 @@ class PathController:
                     random_location = random.choice(nearby_locations)
                     conn.close()
                     return random_location[0]
-            
+
+    def get_where_clause(self, location_type, last_location, search_radius, zip_codes, cost, stars):
+        where_clause = f"WHERE location_type_id = {location_type}"
+
+        if last_location is not None:
+            # Initialize database connection cursor
+            conn = sqlite3.connect('db.sqlite3')
+            cursor = conn.cursor()
+
+            # Fetch the location and latitude of the previous location
+            cursor.execute(f"SELECT latitude, longitude FROM myapi_location WHERE id = {last_location}")
+            previous_location = cursor.fetchone()
+            previous_lat = previous_location[0]
+            previous_lon = previous_location[1]
+            conn.close()
+
+            # Calculate latitude and longitude ranges within the search radius
+            lat_range = search_radius / PathController.FEET_PER_DEGREE_LAT
+            lon_range = search_radius / PathController.FEET_PER_DEGREE_LON
+            nearby_location_clause = f" AND (latitude BETWEEN {previous_lat - lat_range} AND {previous_lat + lat_range}) AND (longitude BETWEEN {previous_lon - lon_range} AND {previous_lon + lon_range})"
+            where_clause += nearby_location_clause
+
+        if zip_codes is not None:
+            zip_codes_str = ','.join([f"'{zip_code}'" for zip_code in zip_codes])
+            zip_code_clause = f" AND zip_code IN ({zip_codes_str})"
+            where_clause += zip_code_clause
+
+        if cost is not None:
+            cost_clause = f" AND cost = '{cost} '"
+            where_clause += cost_clause
+
+        if stars is not None:
+            stars_clause = f" AND average_star_rating >= {stars}"
+            where_clause += stars_clause
+
+        return where_clause
+
     def fetch_location_data(self, location_id):
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
@@ -213,6 +237,8 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
+                "X-Goog-Api-Key": "keyHere"
+
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -220,7 +246,9 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route, transit_type):
+
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, transit_type, cost, stars, route):
+
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -232,7 +260,9 @@ class PathController:
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type)
+
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, transit_type, cost, stars)
+
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -264,11 +294,13 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood, transitType):
+
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, transitType, cost, stars):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route, transitType))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood, transitType, cost, stars, route))
+
         p.start()
         p.join(10)
 

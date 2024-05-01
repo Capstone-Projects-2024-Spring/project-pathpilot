@@ -65,9 +65,11 @@ def calculate_route(request):
             if(transitType==13 or transitType == 15): #13 = subways; 14 = regional rail
                 location_types.insert(0, transitType) #add to the beginning
                 location_types.append(transitType) #add to the end, not guaranteed or neccessary to be the same station, just one close
-        
+        cost = request.data.get("cost")
+        stars = request.data.get("stars")
         path_controller = PathController()
-        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, transitType)
+        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, transitType, cost, stars)
+
         print("did it get to here")
         if route:
             # only calculate polyline if no error (route is not None)
