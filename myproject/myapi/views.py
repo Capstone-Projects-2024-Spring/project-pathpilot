@@ -63,6 +63,8 @@ def calculate_route(request):
 
         #crawl version, must be before transit is added
         if(crawlSize!= None):
+            if(len(location_types)>1): #in case they selected too many
+                return JsonResponse({'error': 'Only One Location Allowed For Crawl Mode'})
             print("made it in here")
             i=0
             choice = location_types[0]
