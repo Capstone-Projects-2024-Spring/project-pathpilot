@@ -8,5 +8,6 @@ urlpatterns = [
     path('calculateRoute/', views.calculate_route, name='calculate_route'),
     path('addSavedRoute/', views.add_saved_route, name='add_saved_route'),
     path('getSavedRoutes/', views.get_saved_routes, name='get_saved_routes'),
-    path('getUsername/', views.get_username, name='get_username')
+    path('getUsername/', views.get_username, name='get_username'),
+    path('useAIFunctionality/', views.get_AI_suggestion, name='get_AI_suggestion')
 ]
