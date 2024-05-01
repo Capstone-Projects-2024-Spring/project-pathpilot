@@ -12,6 +12,8 @@ import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
+import PlanAIInput from './PlanAIInput.jsx';
+import Box from '@mui/material/Box';
 
 const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, updateAttributeList }) => {
     const [selectedTypeLocations, setSelectedTypeLocations] = useState([]);
@@ -23,6 +25,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [error, setError] = useState(false);
     const [advancedOptions, setAdvancedOptions] = useState(false);
     const [open, setOpen] = useState(true);
+    const [modalOpen, setModalOpen] = useState(false)
 
     const animatedComponents = makeAnimated();
 
@@ -73,6 +76,10 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         { value: 'trolley', label: 'Trolley Stop'},
         { value: 'regional rail', label: 'Regional Rail Station'}
     ];
+
+    const updateModalState = () => {
+        setModalOpen(!modalOpen);
+    }
 
     const handleTypeChange = (e) => {
         if(e.target.checked) {
@@ -145,6 +152,16 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             console.log("ERROR")
         }
     }
+
+    const handleModalOpen = () => {
+        setModalOpen(true);
+        console.log("in here modal");
+    }
+ 
+
+    useEffect(() => {
+        console.log(modalOpen);
+    }, [modalOpen]);
     //console.log("locations = ", locations);
     //console.log("path = ", path);
 
@@ -152,7 +169,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     return (
         <div className='input-padding'>
             <h2>Where would you like to go?</h2>
-            <FormGroup>
+            <div className='location-type-selection'>
+            <Box sx={ {display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gridGap: '1em'} }>
             {
                 LocationTypes?.map((type) =>
                 <div>
@@ -163,7 +181,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                 </div>
                 )
             }
-            </FormGroup>
+            </Box>
+            </div>
 
             {
                 advancedOptions ? 
@@ -270,6 +289,10 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             <div className='submit-button-container'>
                 <button disabled={loading || selectedTypeLocations.length === 0 || selectedTypeLocations.length > 10} className='submit-button' onClick={SendManualInputToBackend}>Submit</button>
             </div>
+            <div className='ai-click-holder'>Need some extra inspiration?
+            <button disabled={loading} className='ai-click' onClick={handleModalOpen}>Try our *AI powered* planning functionality</button>
+            </div>
+            <PlanAIInput updateModalState={updateModalState} modalOpen={modalOpen} updateLocations={updateLocations} updateAdvancedOptions={updateAdvancedOptions} updatePoly={updatePoly} updateAttributeList={updateAttributeList} />
         </div>
     )
 };
