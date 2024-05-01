@@ -131,17 +131,19 @@ class PathController:
             nearby_locations_with_attributes = []
 
             #add the last added to location to our list of crawl options used
-            crawl_locations.append(last_location)
-            #print(crawl_locations)
-            #print("Nearby locations")
-            #print(nearby_locations)
-            for i in nearby_locations: #avoid repeats for crawl option
-                #if this location has already been added, remove it from our list of options
-                if(i[0] in crawl_locations):
-                    print("should be removing")
-                    #print(i)
-                    nearby_locations.remove(i)
-                    #print(nearby_locations)
+            
+            if(crawlNum != None): #only edit crawl list if we want to crawl
+                crawl_locations.append(random_location[0]) #add location to crawl list
+                #print(crawl_locations)
+                #print("Nearby locations")
+                #print(nearby_locations)
+                for i in nearby_locations: #avoid repeats for crawl option
+                    #if this location has already been added, remove it from our list of options
+                    if(i[0] in crawl_locations):
+                        print("should be removing")
+                        #print(i)
+                        nearby_locations.remove(i)
+                    
 
 
             if len(attributes) > 0:
