@@ -45,7 +45,7 @@ class PathController:
         # Returns > 0 IF nearby location is found
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, transit_type):
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum):
         conn = sqlite3.connect('db.sqlite3')
         # Initialize database connection cursor
         cursor = conn.cursor()
@@ -245,7 +245,7 @@ class PathController:
         else:
             return None
         
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route, crawlNum, transit_type):
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, route, crawlNum):
         # Initialize variables
         route_ids = []
         attempted_starting_locations = set()
@@ -257,7 +257,7 @@ class PathController:
         while len(route_ids) != len(location_types):
                 
                 # Fetch a random location of the current location type
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, transit_type)
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum)
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
@@ -289,11 +289,11 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood, crawlSize, transitType):
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, crawlSize):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route, crawlSize, transitType))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood,route, crawlSize))
         p.start()
         p.join(10)
 

@@ -83,7 +83,7 @@ def calculate_route(request):
             
 
         path_controller = PathController()
-        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, crawlSize, transitType)
+        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, crawlSize)
         print("did it get to here")
         if route:
             # only calculate polyline if no error (route is not None)
