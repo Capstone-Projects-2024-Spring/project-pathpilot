@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
 from myapi.PathController import PathController
+from myapi.SuggestionsController import SuggestionsController
 from myapi.SavedRoutesController import SavedRoutesController
 from myapi.models import Account
 from django.contrib.auth.models import User
@@ -114,6 +115,21 @@ def get_username(request):
             return JsonResponse({'username': username})
         else:
             return JsonResponse({'error': 'User is not authenticated'}, status=401)
+    else:
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@api_view(['GET'])
+def get_AI_suggestion(request):
+    if request.method == 'GET':
+        user_input = request.GET.get('userInput')
+        print("user input")
+        print(user_input)
+        suggetions_controller = SuggestionsController()
+        recommended_location_types = suggetions_controller.getAllInput(user_input)
+        if len(recommended_location_types) == 0:
+            return JsonResponse({'error': 'No appropriate location types'})
+        else: 
+            return JsonResponse({'recommendation': recommended_location_types})
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
