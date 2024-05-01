@@ -105,8 +105,9 @@ const PlanAIInput = ({updateModalState, modalOpen, updateLocations, updateAdvanc
         setSelectedTypeLocations([]);
         setSuggestedTypes([]);
         setLastSelected([]);
-        setOpen(false)
-        updateModalState(false)
+        setOpen(false);
+        setAdvancedOptions(false);
+        updateModalState(false);
     } 
 
     //Send API user input to backend
