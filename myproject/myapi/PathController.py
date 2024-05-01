@@ -237,7 +237,7 @@ class PathController:
 
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
-                "X-Goog-Api-Key": "keyHere"
+                "X-Goog-Api-Key": "keyhere"
 
             }
 
