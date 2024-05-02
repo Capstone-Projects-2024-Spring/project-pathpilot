@@ -85,7 +85,9 @@ def calculate_route(request):
         cost = request.data.get("cost")
         stars = request.data.get("stars")
         path_controller = PathController()
+
         route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, crawlSize, cost, stars)
+
 
         print("did it get to here")
         if route:

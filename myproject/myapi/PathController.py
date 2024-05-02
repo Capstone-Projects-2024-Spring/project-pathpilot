@@ -38,7 +38,7 @@ class PathController:
 
     # Measured In Feet
     INITIAL_SEARCH_RADIUS = 2000
-    SEARCH_RADIUS_LIMIT = 5000
+    SEARCH_RADIUS_LIMIT = 4000
 
     FEET_PER_DEGREE_LAT = 364000
     FEET_PER_DEGREE_LON = 288200
@@ -52,6 +52,7 @@ class PathController:
 
 
     def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, cost, stars):
+
 
         conn = sqlite3.connect('db.sqlite3')
 
@@ -276,7 +277,9 @@ class PathController:
             return None
         
 
+
     def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, crawlNum, cost, stars, route):
+
 
         # Initialize variables
         route_ids = []
@@ -290,7 +293,9 @@ class PathController:
                 
                 # Fetch a random location of the current location type
 
+
                 location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, cost, stars)
+
 
 
                 # If nearby location is found, add location to route
@@ -325,11 +330,13 @@ class PathController:
         route["route"] = reasonable_route
     
 
+
     def calculateReasonableRoute(self, location_types, attributes, neighborhood, crawlSize, cost, stars):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
         p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood, crawlSize, cost, stars, route))
+
 
         p.start()
         p.join(10)

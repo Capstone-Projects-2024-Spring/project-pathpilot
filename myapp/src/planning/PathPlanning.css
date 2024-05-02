@@ -54,15 +54,8 @@ body {
 
 .start-again-and-save-route-button-container {
     display: flex;
-    justify-content: center; /* Align buttons horizontally */
+    justify-content: space-evenly; /* Align buttons horizontally */
     margin: auto;
-}
-
-.submit-button-container {
-    display: flex;
-    justify-content: center;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
 }
 
 .start-again-button-container {
