@@ -97,7 +97,7 @@ def calculate_route(request):
                 else:
                     #route.remove(route[i])
                     print("REMOVED FROM ROUTE")
-            if(len(newRoute)<len(route)): #if we removed things tell the user
+            #if(len(newRoute)<len(route)): #if we removed things tell the user
                 #ERROR MESSAGE HERE
             route = newRoute
 
