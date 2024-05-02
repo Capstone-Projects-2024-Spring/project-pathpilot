@@ -308,7 +308,7 @@ class PathController:
                     last_location = location_id
                  
                 # If no nearby location is found, backtrack to previous location
-                elif location_id == 0:
+                elif location_id == 0 and len(route_ids)!=0: #pop protection
                     location_id = route_ids.pop()
                     #crawl_locations.remove(last_location) #take out of crawl list
 
