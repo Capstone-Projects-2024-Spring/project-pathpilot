@@ -88,6 +88,12 @@ body {
     color: rgb(202, 202, 202);
 }
 
+.submit-button-container {
+    display: flex;
+    justify-content: space-evenly; /* Align buttons horizontally */
+    margin: auto;
+}
+
 .bold-text {
     font-weight: bold;
 }
