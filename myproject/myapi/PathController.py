@@ -108,7 +108,7 @@ class PathController:
                     conn.close()
 
                     if(crawlNum != None): #only add to crawl list if we want to crawl
-                        crawl_locations.append(random_location[0]) #add location to crawl list
+                        crawl_locations.append(random_location["location"][0]) #add location to crawl list
                     
                     return random_location["location"][0]
                 else:
@@ -171,10 +171,14 @@ class PathController:
                     random_location_id = random.randint(0,counter)
                     random_location = sort_nearby_list[random_location_id]
                     conn.close()
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location["location"][0]) #add location to crawl list
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(nearby_locations)
                     conn.close()
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location[0]) #add location to crawl list
                     return random_location[0]
 
     def get_where_clause(self, location_type, last_location, search_radius, zip_codes, cost, stars):
