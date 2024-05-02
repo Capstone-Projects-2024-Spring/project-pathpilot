@@ -87,7 +87,19 @@ def calculate_route(request):
         path_controller = PathController()
 
         route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, crawlSize, cost, stars)
-
+        idsList = [] 
+        newRoute = []
+        if(crawlSize!= None): #remove repeats from routes, provide less stops instead
+            for i in range(len(route)):
+                if(route[i][0] not in idsList):
+                    idsList.append(route[i][0])
+                    newRoute.append(route[i]) #ignoring other ones
+                else:
+                    #route.remove(route[i])
+                    print("REMOVED FROM ROUTE")
+            #if(len(newRoute)<len(route)): #if we removed things tell the user
+                #ERROR MESSAGE HERE
+            route = newRoute
 
         print("did it get to here")
         if route:
