@@ -206,14 +206,18 @@ class PathController:
             zip_codes_str = ','.join([f"'{zip_code}'" for zip_code in zip_codes])
             zip_code_clause = f" AND zip_code IN ({zip_codes_str})"
             where_clause += zip_code_clause
+        if cost is not None: #transit and parks ignore
+            print("LO TYPE")
+            print(location_type)
+            if(location_type not in ["6","7","11","16","13","15"]):
+                print("are we here")
+                cost_clause = f" AND cost = '{cost} '"
+                where_clause += cost_clause
 
-        if cost is not None:
-            cost_clause = f" AND cost = '{cost} '"
-            where_clause += cost_clause
-
-        if stars is not None:
-            stars_clause = f" AND average_star_rating >= {stars}"
-            where_clause += stars_clause
+        if stars is not None: #transit ignore
+            if(location_type not in ["11","16","13","15"]):
+                stars_clause = f" AND average_star_rating >= {stars}"
+                where_clause += stars_clause
 
         return where_clause
 
