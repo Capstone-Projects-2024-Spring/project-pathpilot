@@ -19,8 +19,8 @@ from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-PLACETYPE = "restaurants"
-ZIPCODEINPUT = 19130
+PLACETYPE = "bars"
+ZIPCODEINPUT = 19102
 insideURLArray = []
 finalRestaurantList = [None] * 10
 #restaurantList = []
@@ -160,6 +160,16 @@ def parseInsideRequest(response): #returns all information, from business's own 
                             case "Outdoor Seating":
                                 attributeArray.append(attribute)
                             case "No Outdoor Seating":
+                                attributeArray.append(attribute)
+                            case "Divey": #bars
+                                attributeArray.append(attribute)
+                            case "Pool Table": #bars
+                                attributeArray.append(attribute)
+                            case "No Pool Table": #bars
+                                attributeArray.append(attribute)
+                            case "Juke Box": #bars
+                                attributeArray.append(attribute)
+                            case "TV": #bars
                                 attributeArray.append(attribute)
                             case "Dairy-Free Options": #added for ice cream shops
                                 attributeArray.append(attribute)
@@ -345,6 +355,8 @@ def addtoDatabase(infoDict):
             loTypeID = 13
         case "alis+wagon" | "gift+shop" | "paper+source" | "greeting+card" | "occasionette" | "art+star"| "common+ground"|"ritual+shoppe"|"open+house"|"nice+things+handmade"|"south+fellini"|"moon+arrow"|"love+yourself"|"mitchell+ness"|"trunc"|"vix+emporium":
             loTypeID = 14
+        case "bars":
+            loTypeID = 17
     #databaseArray = ["idk", name, zipcode, latitude, longitude, address, json.dumps(hours), rating, 1, json.dumps(attributes), priceValue]
     #print(databaseArray)
     print("hey")
@@ -353,7 +365,7 @@ def addtoDatabase(infoDict):
     cursor = conn.cursor()
     cursor.execute("INSERT OR IGNORE INTO myapi_locationtype (location_type) VALUES (?)", (PLACETYPE,)) #put in the location type thing, ignores duplicates
     
-    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ? AND street_address = ?", (name, address,)) #grab the name if its in there already
+    cursor.execute("SELECT * FROM myapi_location WHERE location_name = ? AND street_address = ? AND location_type_id = ?", (name, address, loTypeID)) #grab the name if its in there already, under same location type id
     existing_row = cursor.fetchone()
     if(existing_row == None): #if it isnt in the database already, add it
         cursor.execute("INSERT INTO myapi_location (location_name, zip_code, latitude, longitude, street_address, hours_of_op, average_star_rating, location_type_id, attributes, cost) VALUES (?,?,?,?,?,?,?,?,?,?)", (name, zipcode, latitude, longitude, address, json.dumps(hours) , rating, loTypeID, json.dumps(attributes), priceValue))

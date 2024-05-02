@@ -5,7 +5,8 @@ import json
 from operator import itemgetter
 import multiprocessing
 
-#global transit value, want to ensure we don't skip first value (allows us to redo original fetch)
+crawl_locations = []
+
 class PathController:
 
     # Ensure this is in sync with neighborhoods in PlanManualInput.jsx
@@ -48,7 +49,11 @@ class PathController:
         # Returns 0 IF no nearby location is found
         # Returns -1 IF there are no more available starting locations
 
-    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost, stars):
+
+
+    def fetch_random_location(self, location_type, attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, cost, stars):
+
+
         conn = sqlite3.connect('db.sqlite3')
 
         # Initialize database connection cursor
@@ -58,6 +63,9 @@ class PathController:
 
         where_clause = self.get_where_clause(location_type, last_location, search_radius, zip_codes, cost, stars)
 
+        global crawl_locations
+        #transit mode, so we don't skip first entry beyond transit
+        #global transitAdded
         # If route is currently empty, select a random starting location
         if last_location is None:
             cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
@@ -98,10 +106,17 @@ class PathController:
                     random_location_id = random.randint(0,counter)
                     random_location = sort_unnattempted_list[random_location_id]
                     conn.close()
+
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location["location"][0]) #add location to crawl list
+                    
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(unattempted_starting_locations)
                     conn.close()
+
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location[0]) #add location to crawl list
                     return random_location[0]
         
         # If route is not currently empty, select a random location that is within the specified radius from the previous location
@@ -109,6 +124,22 @@ class PathController:
             cursor.execute(f"SELECT id,attributes FROM myapi_location {where_clause}")
             nearby_locations = cursor.fetchall()
             nearby_locations_with_attributes = []
+
+            #add the last added to location to our list of crawl options used
+            
+            if(crawlNum != None): #only edit crawl list if we want to crawl
+                crawl_locations.append(last_location) #add location to crawl list
+                #print(crawl_locations)
+                #print("Nearby locations")
+                #print(nearby_locations)
+                for i in nearby_locations: #avoid repeats for crawl option
+                    #if this location has already been added, remove it from our list of options
+                    if(i[0] in crawl_locations):
+                        print("should be removing")
+                        #print(i)
+                        nearby_locations.remove(i)
+                    
+
 
             if len(attributes) > 0:
                 for loc in nearby_locations:
@@ -140,10 +171,14 @@ class PathController:
                     random_location_id = random.randint(0,counter)
                     random_location = sort_nearby_list[random_location_id]
                     conn.close()
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location["location"][0]) #add location to crawl list
                     return random_location["location"][0]
                 else:
                     random_location = random.choice(nearby_locations)
                     conn.close()
+                    if(crawlNum != None): #only add to crawl list if we want to crawl
+                        crawl_locations.append(random_location[0]) #add location to crawl list
                     return random_location[0]
 
     def get_where_clause(self, location_type, last_location, search_radius, zip_codes, cost, stars):
@@ -238,7 +273,6 @@ class PathController:
             header = {
                 "X-Goog-FieldMask": "routes.duration,routes.legs.startLocation,routes.legs.endLocation,routes.distanceMeters,routes.polyline.encodedPolyline",
                 "X-Goog-Api-Key": "keyhere"
-
             }
 
             response = requests.post(url, json=params, headers=header)
@@ -247,7 +281,9 @@ class PathController:
             return None
         
 
-    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, cost, stars, route):
+
+    def calculateReasonableRouteFunc(self, location_types, attributes, neighborhood, crawlNum, cost, stars, route):
+
 
         # Initialize variables
         route_ids = []
@@ -261,17 +297,20 @@ class PathController:
                 
                 # Fetch a random location of the current location type
 
-                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, cost, stars)
+
+                location_id = self.fetch_random_location(location_types[len(route_ids)], attempted_starting_locations, search_radius, last_location, attributes, zip_codes, crawlNum, cost, stars)
+
 
 
                 # If nearby location is found, add location to route
                 if location_id > 0:
                     route_ids.append(location_id)
                     last_location = location_id
-
+                 
                 # If no nearby location is found, backtrack to previous location
                 elif location_id == 0:
                     location_id = route_ids.pop()
+                    #crawl_locations.remove(last_location) #take out of crawl list
 
                     # If the starting location can not be used for a reasonable route with the current search radius, mark it as attempted
                     if len(route_ids) == 0:
@@ -294,11 +333,14 @@ class PathController:
 
         route["route"] = reasonable_route
     
-    def calculateReasonableRoute(self, location_types, attributes, neighborhood, cost, stars):
+
+
+    def calculateReasonableRoute(self, location_types, attributes, neighborhood, crawlSize, cost, stars):
         manager = multiprocessing.Manager()
         route = manager.dict()
 
-        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood, cost, stars, route))
+        p = multiprocessing.Process(target=self.calculateReasonableRouteFunc, args=(location_types,attributes,neighborhood, crawlSize, cost, stars, route))
+
 
         p.start()
         p.join(10)

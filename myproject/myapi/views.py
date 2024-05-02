@@ -60,16 +60,34 @@ def calculate_route(request):
         attributes = request.data.get('attributesToSend')
         neighborhood = request.data.get('neighborhood')
         transitType = request.data.get('locatedNear')
+        crawlSize = request.data.get('crawlChoice')
+
+        #crawl version, must be before transit is added
+        if(crawlSize!= None):
+            if(len(location_types)>1): #in case they selected too many
+                return JsonResponse({'error': 'Only One Location Allowed For Crawl Mode'})
+            print("made it in here")
+            i=0
+            choice = location_types[0]
+            while (i<crawlSize-1):
+                i+=1
+                location_types.append(choice) #repeat it on list
+                
+        
+        #accomodate for chosen transit method
         if(transitType!=None): #put it in there!
             if(transitType==11): #parking garage, add to beginning
                 location_types.insert(0, transitType)
-            if(transitType==13 or transitType == 15): #13 = subways; 14 = regional rail
+            if(transitType==13 or transitType == 15 or transitType==16): #13 = subways; 15 = trolleys; 16 = regional rail
                 location_types.insert(0, transitType) #add to the beginning
                 location_types.append(transitType) #add to the end, not guaranteed or neccessary to be the same station, just one close
+            print(location_types)
         cost = request.data.get("cost")
         stars = request.data.get("stars")
         path_controller = PathController()
-        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, cost, stars)
+
+        route = path_controller.calculateReasonableRoute(location_types, attributes, neighborhood, crawlSize, cost, stars)
+
 
         print("did it get to here")
         if route:
