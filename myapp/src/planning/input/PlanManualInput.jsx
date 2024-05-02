@@ -71,10 +71,9 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
 
     const locatedNearLocations = [
         { value: 13, label: 'BSL or MFL Subway Stop'},
-        { value: 'bus', label: 'Bus Stop'},
         { value: 11, label: 'Parking Garage'},
-        { value: 'trolley', label: 'Trolley Stop'},
-        { value: 'regional rail', label: 'Regional Rail Station'}
+        { value: 15, label: 'Trolley Stop'},
+        { value: 16, label: 'Regional Rail Station'}
     ];
 
     const updateModalState = () => {
