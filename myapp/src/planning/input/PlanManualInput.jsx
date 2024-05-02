@@ -20,6 +20,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [selectedAttributes, setSelectedAttributes] = useState([]);
     const [costChoice, setCostChoice] = useState(null);
     const [starsChoice, setStarsChoice] = useState(null);
+    const [crawlChoice, setCrawlChoice] = useState(null);
     const [neighborhoodChoice, setNeighborhoodChoice] = useState(null);
     const [locatedNear, setLocatedNear] = useState(null);
     const [error, setError] = useState(false);
@@ -47,6 +48,16 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
         { value: 2, label: '2 Stars' },
         { value: 3, label: '3 Stars' },
         { value: 4, label: '4 Stars' }
+    ];
+
+    const crawls = [
+        { value: 2, label: '2 Spots' },
+        { value: 3, label: '3 Spots' },
+        { value: 4, label: '4 Spots' },
+        { value: 5, label: '5 Spots' },
+        { value: 6, label: '6 Spots' },
+        { value: 8, label: '8 Spots' },
+        { value: 10, label: '10 Spots' }
     ];
 
     // Ensure this is in sync with zip_code_mapping in PathController.py
@@ -127,13 +138,14 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
             console.log(selectedAttributes);
             setLoading(true);
             setError(false);
-            const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear);
+            const pathData = await FetchPathCalculation(selectedTypeLocations, selectedAttributes, costChoice, starsChoice, neighborhoodChoice, locatedNear, crawlChoice);
             //pathData.locations ? setLocations(pathData.locations) : console.log("ERROR");
             //pathData.path ? setPath(pathData.path) : console.log("ERROR");
             //console.log(JSON.parse(pathData.route[0][9]));
             if(pathData.hasOwnProperty("error")) {
                 setLoading(false);
                 setError(true);
+                setErrorMessage(pathData.error);
                 setOpen(true);
                 console.log("error here");
             } else {
@@ -244,6 +256,17 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                                 placeholder="Select Locations..."
                             />
                         </div>
+                        <div className='select-container'>
+                            <h3>Crawl Mode</h3>
+                            <Select
+                                className="basic-single"
+                                classNamePrefix="select"
+                                onChange={choice => choice === null ? setCrawlChoice(null) : setCrawlChoice(choice.value)}
+                                options={crawls}
+                                isClearable={true}
+                                placeholder="Select Size..."
+                            />
+                        </div>
                     </div>
                 : <div className='advanced-options-title' onClick={handleAdvanceOptions}>Advanced Options</div>
             }
@@ -278,7 +301,7 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
                         severity='error'
                         sx={{ mb: 2 }}
                         >
-                        Error occurred, please try again with a different set of trip requirements
+                        Error! {errorMessage}
                         </Alert>
                     </Collapse>
                 </div>: <div></div>}
