@@ -207,10 +207,7 @@ class PathController:
             zip_code_clause = f" AND zip_code IN ({zip_codes_str})"
             where_clause += zip_code_clause
         if cost is not None: #transit and parks ignore
-            print("LO TYPE")
-            print(location_type)
             if(location_type not in ["6","7","11","16","13","15"]):
-                print("are we here")
                 cost_clause = f" AND cost = '{cost} '"
                 where_clause += cost_clause
 
