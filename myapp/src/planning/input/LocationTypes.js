@@ -12,7 +12,8 @@ const LocationTypes = [
     {value: 9, label: 'Bakery'},
     {value: 10, label: 'Activity'},
     {value: 12, label: 'Bagel Shop'},
-    {value: 14, label: 'Novelty Shop'}
+    {value: 14, label: 'Novelty Shop'},
+    {value: 17, label: 'Bars'}
 ]
 
 export {LocationTypes};
