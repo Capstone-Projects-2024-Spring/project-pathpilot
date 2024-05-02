@@ -27,6 +27,8 @@ const PlanManualInput = ({ updateLocations, updateAdvancedOptions, updatePoly, u
     const [advancedOptions, setAdvancedOptions] = useState(false);
     const [open, setOpen] = useState(true);
     const [modalOpen, setModalOpen] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
+
 
     const animatedComponents = makeAnimated();
 
