@@ -103,3 +103,11 @@ npm start
 This will start the React development server. Open your web browser and navigate to http://localhost:3000/
 
 For login screen navigate to http://localhost:3000/login
+
+## How to collect more data for PathPilot database
+1. Open the ScrapeLogicFile inside myproject
+2. Edit the PLACETYPE value to whatever location type is desired to be added to the database
+3. Edit the ZIPCODEINPUT value to whichever area/zipcode is desired to be added to the database
+4. Ensure the PLACETYPE value is accomodated for in the addtoDatabase match case function, ensuring there is a unique loTypeID associated with this PLACETYPE
+5. If less than 300 results (30 pages) will be produced or desired, change the for loop conditions in main to only check the number of pages desired/available
+   **program will stop once it runs out of results to scrape though
