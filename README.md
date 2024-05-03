@@ -29,6 +29,33 @@ For a long time, people have loved to organize day trips, especially in cities l
 
 The background knowledge needed for this project requires experience with Python, specifically using the language to work with .csv data, to make API calls, to connect a frontend architecture to a backend architecture, and to web scrape. It also requires knowledge with frontend languages and frameworks, in this case ReactJS, HTML, and CSS, to create the frontend view and utilize the Maps API to plot users’ returned paths. To develop this project, access to a variety of APIs is required. The Google Maps Routes costs 0.004 dollars per query ($4 per 1000 queries for the basic version). The Google Maps JavaScript API costs 0.007 dollars per map load ($7 per 1000 loads). The Google Maps Places API costs between 0 dollars and 0.040 dollars per call ($40 per 1000 call) depending on the endpoint used. The Yelp API is free to use, with a basic rate limit of 500 calls per day. If funds for Google Map Platform APIs cannot be acquired, possible alternatives such as OpenStreetMap and its applicable APIs would have to be investigated. However, as this data is community collected and organized, it may not be as up-to-date or accurate as the commercial API options.
 
+## Features
+Produce List of Locations: select places on UI and provide list of locations 
+
+Produce Locations in Pre-Selected Neighborhood: system or user selects a neighborhood/zip code to center their location choices around 
+
+Allow Starting Location Near Public Transit: provide list of places but now near transit options  
+
+Allow Starting Location Near Parking Garage: provide list of places near parking garage 
+
+Show Places on the Map: display the places on the map 
+
+Calculate A Reasonable Path Between Places: display a path between places on the map 
+
+Choose Group Attributes: display list of places based on user reviews (romantic, trendy) 
+
+Assist with Open-Ended Planning with Cohere AI: user writes out description of their ideal day and gets provided matching places 
+
+Filter Locations Based on Rating: filter locations based on star rating out of five 
+
+Account Creation: allow user to create a Path Pilot account to savepaths 
+
+Filter Locations Based on Cost: filter locations based on how expensive or inexpensive they are 
+
+## Known Bugs
+
+Inability to find path - Although handled through a combination of frontend and backend logic so that it does not cause an error, sometimes the Path Pilot routing logic fails to find a reasonable route between requested locations within a sensible amount of time (10 seconds). This is especially an issue with location types that do not have many locations, such as subway stops and museums.
+
 ## How To Run Path Pilot
 
 ### Install Python and Node.js if you haven't
